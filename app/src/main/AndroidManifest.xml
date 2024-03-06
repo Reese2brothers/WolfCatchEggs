@@ -13,6 +13,14 @@
         android:theme="@style/Theme.WolfCatchEggs"
         tools:targetApi="31">
         <activity
+            android:name=".WolfActivity"
+            android:screenOrientation="landscape"
+            android:exported="false" />
+        <activity
+            android:name=".SplashActivity"
+            android:screenOrientation="landscape"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
