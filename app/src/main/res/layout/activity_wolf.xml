@@ -28,7 +28,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:layout_width="100dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
@@ -40,7 +40,8 @@
             android:id="@+id/btLeftUp"
             android:layout_width="85dp"
             android:layout_height="85dp"
-            android:layout_margin="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="40dp"
             android:backgroundTint="@color/blue"
             android:rotation="-95"
             android:scaleType="centerCrop"
@@ -50,7 +51,7 @@
             android:id="@+id/btLeftDown"
             android:layout_width="85dp"
             android:layout_height="85dp"
-            android:layout_margin="10dp"
+            android:layout_marginBottom="40dp"
             android:backgroundTint="@color/blue"
             android:rotation="-160"
             android:scaleType="centerCrop"
@@ -71,7 +72,8 @@
             android:id="@+id/btRightUp"
             android:layout_width="85dp"
             android:layout_height="85dp"
-            android:layout_margin="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="40dp"
             android:backgroundTint="@color/blue"
             android:scaleType="centerCrop"
             app:srcCompat="@drawable/baseline_near_me_24" />
@@ -80,7 +82,7 @@
             android:id="@+id/btRightDown"
             android:layout_width="85dp"
             android:layout_height="85dp"
-            android:layout_margin="10dp"
+            android:layout_marginBottom="40dp"
             android:backgroundTint="@color/blue"
             android:rotation="69"
             android:scaleType="centerCrop"
@@ -214,6 +216,7 @@
         android:id="@+id/ivWolfRightDown"
         android:layout_width="115dp"
         android:layout_height="150dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintEnd_toStartOf="@+id/view8"
         app:srcCompat="@drawable/wolfrightdowntwo" />
@@ -250,34 +253,30 @@
         android:id="@+id/ivWolfRightUp"
         android:layout_width="140dp"
         android:layout_height="160dp"
-        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintEnd_toStartOf="@+id/view10"
         app:srcCompat="@drawable/wolfrightuptwo" />
 
     <ImageView
         android:id="@+id/ivEggLeftUp"
-        android:layout_width="15dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         app:layout_constraintBottom_toTopOf="@+id/view5"
         app:layout_constraintStart_toEndOf="@+id/imageView6"
         app:srcCompat="@drawable/egg" />
 
     <ImageView
         android:id="@+id/ivEggLeftDown"
-        android:layout_width="15dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         app:layout_constraintBottom_toTopOf="@+id/view3"
         app:layout_constraintStart_toEndOf="@+id/imageView4"
         app:srcCompat="@drawable/egg" />
 
     <ImageView
         android:id="@+id/ivEggRightUp"
-        android:layout_width="15dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         app:layout_constraintBottom_toTopOf="@+id/view9"
         app:layout_constraintEnd_toStartOf="@+id/imageView12"
         app:srcCompat="@drawable/egg" />
@@ -310,10 +309,22 @@
         app:srcCompat="@drawable/smashegg" />
 
     <ImageView
-        android:id="@+id/ivPlay"
+        android:id="@+id/ivPlayA"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/baseline_play_arrow_24" />
+
+    <ImageView
+        android:id="@+id/ivPlayB"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/view"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -323,6 +334,8 @@
         android:id="@+id/tvPlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:fontFamily="@font/minutes"
         android:padding="4dp"
         android:shadowColor="@color/black"
         android:shadowDx="2"
@@ -332,9 +345,11 @@
         android:textColor="@color/green"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/ivPlay"
-        app:layout_constraintStart_toStartOf="@+id/ivPlay"
-        app:layout_constraintTop_toBottomOf="@+id/ivPlay" />
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/view"
+        app:layout_constraintHorizontal_bias="0.565"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvCount"
@@ -342,6 +357,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
+        android:fontFamily="@font/minutes"
+        android:padding="4dp"
         android:shadowColor="@color/black"
         android:shadowDx="2"
         android:shadowDy="2"
@@ -352,4 +369,95 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/view2"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btGameA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/blue"
+        android:fontFamily="@font/minutes"
+        android:text="Game A"
+        android:textColor="@color/green"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:cornerRadius="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/view2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="@color/green"
+        app:strokeWidth="1dp" />
+
+    <Button
+        android:id="@+id/btGameB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/blue"
+        android:fontFamily="@font/minutes"
+        android:text="Game B"
+        android:textColor="@color/green"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:cornerRadius="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/view2"
+        app:layout_constraintTop_toBottomOf="@+id/btGameA"
+        app:strokeColor="@color/green"
+        app:strokeWidth="1dp" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/outofafrica"
+        android:text="Best record "
+        android:textColor="@color/green"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/view"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvBestRecordA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/sfnsdisplaybold"
+        android:text="Game A : 0"
+        android:textColor="@color/green"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/view"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/tvBestRecordB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/sfnsdisplaybold"
+        android:text="Game B : 0"
+        android:textColor="@color/green"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/view"
+        app:layout_constraintTop_toBottomOf="@+id/tvBestRecordA" />
+
+    <TextView
+        android:id="@+id/tvSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/outofafrica"
+        android:paddingEnd="4dp"
+        android:text="Speed : 1"
+        android:textColor="@color/green"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/view"
+        app:layout_constraintTop_toBottomOf="@+id/tvBestRecordB" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
