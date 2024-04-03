@@ -2,9 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/c"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue"
+    android:background="@color/darkblue"
     tools:context=".WolfActivity">
 
     <View
@@ -12,7 +13,7 @@
         android:layout_width="4dp"
         android:layout_height="0dp"
         android:layout_marginStart="130dp"
-        android:background="@color/green"
+        android:background="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -22,7 +23,7 @@
         android:layout_width="4dp"
         android:layout_height="0dp"
         android:layout_marginEnd="130dp"
-        android:background="@color/green"
+        android:background="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,26 +37,47 @@
         app:layout_constraintEnd_toStartOf="@+id/view"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageButton
-            android:id="@+id/btLeftUp"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvLeftUpButton"
             android:layout_width="85dp"
             android:layout_height="85dp"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="40dp"
-            android:backgroundTint="@color/blue"
-            android:rotation="-95"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/baseline_near_me_24" />
+            android:layout_marginBottom="30dp"
+            app:cardBackgroundColor="@color/yellowlight"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="5dp">
 
-        <ImageButton
-            android:id="@+id/btLeftDown"
+            <ImageView
+                android:id="@+id/btLeftUp"
+                android:layout_width="85dp"
+                android:layout_height="85dp"
+                android:backgroundTint="@color/blue"
+                android:rotation="-95"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/baseline_near_me_24" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvLeftDownButton"
             android:layout_width="85dp"
             android:layout_height="85dp"
-            android:layout_marginBottom="40dp"
-            android:backgroundTint="@color/blue"
-            android:rotation="-160"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/baseline_near_me_24" />
+            android:layout_marginBottom="30dp"
+            app:cardBackgroundColor="@color/yellowlight"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="5dp">
+
+            <ImageView
+                android:id="@+id/btLeftDown"
+                android:layout_width="85dp"
+                android:layout_height="85dp"
+                android:layout_marginBottom="40dp"
+                android:backgroundTint="@color/blue"
+                android:rotation="-160"
+                android:scaleType="centerCrop"
+                android:translationX="7dp"
+                app:srcCompat="@drawable/baseline_near_me_24" />
+        </androidx.cardview.widget.CardView>
+
     </LinearLayout>
 
     <LinearLayout
@@ -68,25 +90,52 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/view2">
 
-        <ImageButton
-            android:id="@+id/btRightUp"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvRightUpButton"
             android:layout_width="85dp"
             android:layout_height="85dp"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="40dp"
-            android:backgroundTint="@color/blue"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/baseline_near_me_24" />
+            android:layout_marginBottom="30dp"
+            app:cardBackgroundColor="@color/yellowlight"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="5dp">
 
-        <ImageButton
-            android:id="@+id/btRightDown"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/btRightUp"
+                    android:layout_width="85dp"
+                    android:layout_height="85dp"
+                    android:layout_marginBottom="40dp"
+                    android:backgroundTint="@color/blue"
+                    android:scaleType="centerCrop"
+                    app:srcCompat="@drawable/baseline_near_me_24" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvRightDownButton"
             android:layout_width="85dp"
             android:layout_height="85dp"
-            android:layout_marginBottom="40dp"
-            android:backgroundTint="@color/blue"
-            android:rotation="69"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/baseline_near_me_24" />
+            android:layout_marginBottom="30dp"
+            app:cardBackgroundColor="@color/yellowlight"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="5dp">
+
+            <ImageView
+                android:id="@+id/btRightDown"
+                android:layout_width="85dp"
+                android:layout_height="85dp"
+                android:backgroundTint="@color/blue"
+                android:rotation="69"
+                android:scaleType="centerCrop"
+                android:translationX="-7dp"
+                app:srcCompat="@drawable/baseline_near_me_24" />
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
 
     <ImageView
@@ -115,7 +164,7 @@
         android:layout_width="90dp"
         android:layout_height="3dp"
         android:layout_marginBottom="92dp"
-        android:background="@color/green"
+        android:background="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintStart_toEndOf="@+id/view" />
 
@@ -134,7 +183,7 @@
         android:layout_height="3dp"
         android:layout_marginStart="-2dp"
         android:layout_marginBottom="84dp"
-        android:background="@color/green"
+        android:background="@color/black"
         android:rotation="22"
         app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintStart_toEndOf="@+id/view3" />
@@ -152,7 +201,7 @@
         android:layout_width="90dp"
         android:layout_height="3dp"
         android:layout_marginBottom="24dp"
-        android:background="@color/green"
+        android:background="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/imageView4"
         app:layout_constraintStart_toEndOf="@+id/view" />
 
@@ -162,7 +211,7 @@
         android:layout_height="3dp"
         android:layout_marginStart="-2dp"
         android:layout_marginBottom="84dp"
-        android:background="@color/green"
+        android:background="@color/black"
         android:rotation="22"
         app:layout_constraintBottom_toTopOf="@+id/view4"
         app:layout_constraintStart_toEndOf="@+id/view5" />
@@ -189,7 +238,7 @@
         android:layout_width="90dp"
         android:layout_height="3dp"
         android:layout_marginBottom="92dp"
-        android:background="@color/green"
+        android:background="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintEnd_toStartOf="@+id/view2" />
 
@@ -199,7 +248,7 @@
         android:layout_height="3dp"
         android:layout_marginEnd="-2dp"
         android:layout_marginBottom="84dp"
-        android:background="@color/green"
+        android:background="@color/black"
         android:rotation="-22"
         app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintEnd_toStartOf="@+id/view7" />
@@ -226,7 +275,7 @@
         android:layout_width="90dp"
         android:layout_height="3dp"
         android:layout_marginBottom="24dp"
-        android:background="@color/green"
+        android:background="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/imageView9"
         app:layout_constraintEnd_toStartOf="@+id/view2" />
 
@@ -236,7 +285,7 @@
         android:layout_height="3dp"
         android:layout_marginEnd="-2dp"
         android:layout_marginBottom="84dp"
-        android:background="@color/green"
+        android:background="@color/black"
         android:rotation="-22"
         app:layout_constraintBottom_toTopOf="@+id/view8"
         app:layout_constraintEnd_toStartOf="@+id/view9" />
@@ -342,7 +391,7 @@
         android:shadowDy="2"
         android:shadowRadius="2"
         android:text="play"
-        android:textColor="@color/green"
+        android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
         android:visibility="gone"
@@ -355,54 +404,54 @@
         android:id="@+id/tvCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
-        android:fontFamily="@font/minutes"
+        android:fontFamily="@font/outofafrica"
         android:padding="4dp"
         android:shadowColor="@color/black"
         android:shadowDx="2"
         android:shadowDy="2"
         android:shadowRadius="2"
         android:text="0"
-        android:textColor="@color/green"
+        android:textColor="@color/black"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/view2"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+        app:layout_constraintEnd_toEndOf="@+id/imageView2"
+        app:layout_constraintHorizontal_bias="0.577"
+        app:layout_constraintStart_toStartOf="@+id/imageView2" />
 
     <Button
         android:id="@+id/btGameA"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:backgroundTint="@color/blue"
+        android:backgroundTint="@color/yellowlight"
         android:fontFamily="@font/minutes"
         android:text="Game A"
-        android:textColor="@color/green"
+        android:textColor="@color/black"
         android:textSize="12sp"
         android:textStyle="bold"
         app:cornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/view2"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/green"
+        app:strokeColor="@color/black"
         app:strokeWidth="1dp" />
 
     <Button
         android:id="@+id/btGameB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/blue"
+        android:backgroundTint="@color/yellowlight"
         android:fontFamily="@font/minutes"
         android:text="Game B"
-        android:textColor="@color/green"
+        android:textColor="@color/black"
         android:textSize="12sp"
         android:textStyle="bold"
         app:cornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/view2"
         app:layout_constraintTop_toBottomOf="@+id/btGameA"
-        app:strokeColor="@color/green"
+        app:strokeColor="@color/black"
         app:strokeWidth="1dp" />
 
     <TextView
@@ -413,7 +462,7 @@
         android:layout_marginTop="8dp"
         android:fontFamily="@font/outofafrica"
         android:text="Best record "
-        android:textColor="@color/green"
+        android:textColor="@color/black"
         android:textSize="12sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/view"
@@ -426,7 +475,7 @@
         android:layout_marginStart="8dp"
         android:fontFamily="@font/sfnsdisplaybold"
         android:text="Game A : 0"
-        android:textColor="@color/green"
+        android:textColor="@color/black"
         android:textSize="10sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/view"
@@ -439,7 +488,7 @@
         android:layout_marginStart="8dp"
         android:fontFamily="@font/sfnsdisplaybold"
         android:text="Game B : 0"
-        android:textColor="@color/green"
+        android:textColor="@color/black"
         android:textSize="10sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/view"
@@ -454,10 +503,153 @@
         android:fontFamily="@font/outofafrica"
         android:paddingEnd="4dp"
         android:text="Speed : 1"
-        android:textColor="@color/green"
+        android:textColor="@color/black"
         android:textSize="12sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/view"
         app:layout_constraintTop_toBottomOf="@+id/tvBestRecordB" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvMusic"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="@color/yellowlight"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:layout_constraintEnd_toStartOf="@+id/view2"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivMusicOff"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/baseline_music_off_24" />
+
+        <ImageView
+            android:id="@+id/ivMusicOn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            app:srcCompat="@drawable/baseline_music_note_24" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvListMusic"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="8dp"
+        app:cardBackgroundColor="@color/yellowlight"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/cvMusic"
+        app:layout_constraintEnd_toStartOf="@+id/cvMusic"
+        app:layout_constraintTop_toTopOf="@+id/cvMusic">
+
+        <ImageView
+            android:id="@+id/imageView7"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/baseline_queue_music_24" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvTracks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:visibility="gone"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        app:layout_constraintEnd_toStartOf="@+id/cvListMusic"
+        app:layout_constraintTop_toTopOf="@+id/cvListMusic">
+
+        <LinearLayout
+            android:id="@+id/llTracks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/yellowlight"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/tvTrack1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/angrybirdsregular"
+                android:padding="2dp"
+                android:text="Track 1"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTrack2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/angrybirdsregular"
+                android:padding="2dp"
+                android:text="Track 2"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTrack3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/angrybirdsregular"
+                android:padding="2dp"
+                android:text="Track 3"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTrack4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/angrybirdsregular"
+                android:padding="2dp"
+                android:text="Track 4"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTrack5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/angrybirdsregular"
+                android:padding="2dp"
+                android:text="Track 5"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTrack6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/angrybirdsregular"
+                android:padding="2dp"
+                android:text="Track 6"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTrack7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/angrybirdsregular"
+                android:padding="2dp"
+                android:text="Track 7"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

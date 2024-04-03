@@ -4,4 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="green">#09870E</color>
     <color name="blue">#B0E4EB</color>
+    <color name="bluelight">#B3D6E6</color>
+    <color name="yellowlight">#DBA506</color>
+    <color name="darkblue">#03A9F4</color>
 </resources>
