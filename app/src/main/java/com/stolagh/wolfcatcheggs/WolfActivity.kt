@@ -69,12 +69,6 @@ class WolfActivity : AppCompatActivity() {
             binding.tvBestRecordA.text = "Game A : $savebestA"
         }
         binding.cvMusic.setOnClickListener {
-//            corMusic = coroutineScope.launch {
-//                binding.cvMusic.setCardBackgroundColor(ContextCompat.getColor(this@WolfActivity, R.color.white))
-//                delay(150)
-//                binding.cvMusic.setCardBackgroundColor(ContextCompat.getColor(this@WolfActivity, R.color.yellowlight))
-//                corMusic?.cancel()
-  //      }
                 if (!pressMusic) {
                     binding.cvMusic.setCardBackgroundColor(ContextCompat.getColor(this@WolfActivity, R.color.white))
                     binding.ivMusicOn.visibility = View.VISIBLE
@@ -477,8 +471,6 @@ class WolfActivity : AppCompatActivity() {
         animation.duration = 500
         binding.cvTracks.startAnimation(animation)
     }
-
-
     private fun track1() : MediaPlayer {
        return MediaPlayer.create(this, R.raw.montazh)
     }
@@ -510,8 +502,10 @@ class WolfActivity : AppCompatActivity() {
         musicPlay.start()
     }
     private fun stopMusic() {
-        if (musicPlay.isPlaying) {
-            musicPlay.stop()
+        if (::musicPlay.isInitialized) {
+            if (musicPlay.isPlaying) {
+                musicPlay.stop()
+            }
         }
     }
     private fun releaseMusicPlay() {
@@ -521,15 +515,6 @@ class WolfActivity : AppCompatActivity() {
             }
             musicPlay.release()
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-//        sharedPrefs = getSharedPreferences("SaveMusic", MODE_PRIVATE)
-//        val editor = sharedPrefs.edit()
-//        editor?.putBoolean("savemusic", track)
-//        editor?.putInt("int", mainCount)
-//        editor?.apply()
     }
     override fun onDestroy() {
         super.onDestroy()
