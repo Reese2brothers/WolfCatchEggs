@@ -6,6 +6,10 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.Window
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.bumptech.glide.Glide
 import com.stolagh.wolfcatcheggs.databinding.ActivitySplashBinding
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +31,7 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        hideSystemUI()
         Glide.with(this).asGif().load(R.drawable.butorange).into(binding.ivButOrange)
         Glide.with(this).asGif().load(R.drawable.butbroun).into(binding.ivButBroun)
         ObjectAnimator.ofFloat(binding.ivButBroun, "translationX", 500f).apply {
@@ -96,5 +101,17 @@ class SplashActivity : AppCompatActivity() {
         currentRotation = binding.ivEgg.rotation
         currentTranslationX = binding.ivEgg.translationX
         currentTranslationY = binding.ivEgg.translationY
+    }
+    private fun hideSystemUI () {
+        val window : Window? = window
+        if (window != null) {
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+        }
+        if (window != null) {
+            WindowInsetsControllerCompat (window, window.decorView).let { controller ->
+                controller.hide (WindowInsetsCompat.Type.systemBars ())
+                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        }
     }
 }
