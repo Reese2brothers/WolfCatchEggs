@@ -27,6 +27,7 @@ class SplashActivity : AppCompatActivity() {
     private var currentRotation = 0f
     private var currentTranslationX = 0f
     private var currentTranslationY = 0f
+    @SuppressLint("ObjectAnimatorBinding")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
@@ -34,15 +35,21 @@ class SplashActivity : AppCompatActivity() {
         hideSystemUI()
         Glide.with(this).asGif().load(R.drawable.butorange).into(binding.ivButOrange)
         Glide.with(this).asGif().load(R.drawable.butbroun).into(binding.ivButBroun)
-        ObjectAnimator.ofFloat(binding.ivButBroun, "translationX", 500f).apply {
-            duration = 3500
-            start()
-        }
-        ObjectAnimator.ofFloat(binding.ivButBroun, "translationY", 800f).apply {
-            duration = 3500
-            start()
-        }
+        binding.progressBar.max = 1000
+        val value = 1000
         coroutinetwo = coroutineScope.launch {
+            ObjectAnimator.ofInt(binding.progressBar, "progress", value).apply {
+                duration = 4000
+                start()
+            }
+            ObjectAnimator.ofFloat(binding.ivButBroun, "translationX", 500f).apply {
+                duration = 3500
+                start()
+            }
+            ObjectAnimator.ofFloat(binding.ivButBroun, "translationY", 800f).apply {
+                duration = 3500
+                start()
+            }
             delay(1000)
             ObjectAnimator.ofFloat(binding.ivButOrange, "translationX", 1200f).apply {
                 duration = 3500

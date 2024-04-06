@@ -388,7 +388,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
-        android:fontFamily="@font/minutes"
+        android:fontFamily="sans-serif-smallcaps"
         android:padding="4dp"
         android:shadowColor="@color/black"
         android:shadowDx="2"
@@ -400,7 +400,6 @@
         android:textStyle="bold"
         android:visibility="gone"
         app:layout_constraintEnd_toStartOf="@+id/view"
-        app:layout_constraintHorizontal_bias="0.565"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -408,7 +407,7 @@
         android:id="@+id/tvCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/outofafrica"
+        android:fontFamily="sans-serif-smallcaps"
         android:padding="4dp"
         android:shadowColor="@color/black"
         android:shadowDx="2"
@@ -416,12 +415,11 @@
         android:shadowRadius="2"
         android:text="0"
         android:textColor="@color/black"
-        android:textSize="34sp"
+        android:textSize="48sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
-        app:layout_constraintEnd_toEndOf="@+id/imageView2"
-        app:layout_constraintHorizontal_bias="0.577"
-        app:layout_constraintStart_toStartOf="@+id/imageView2" />
+        app:layout_constraintEnd_toStartOf="@+id/view2"
+        app:layout_constraintStart_toEndOf="@+id/view" />
 
     <Button
         android:id="@+id/btGameA"
@@ -429,10 +427,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:backgroundTint="@color/yellowlight"
-        android:fontFamily="@font/minutes"
+        android:fontFamily="sans-serif-smallcaps"
         android:text="Game A"
         android:textColor="@color/black"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textStyle="bold"
         app:cornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -446,10 +444,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/yellowlight"
-        android:fontFamily="@font/minutes"
+        android:fontFamily="sans-serif-smallcaps"
         android:text="Game B"
         android:textColor="@color/black"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textStyle="bold"
         app:cornerRadius="10dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -464,10 +462,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/outofafrica"
+        android:fontFamily="sans-serif-smallcaps"
         android:text="Best record "
         android:textColor="@color/black"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/view"
         app:layout_constraintTop_toTopOf="parent" />
@@ -477,10 +475,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:fontFamily="@font/sfnsdisplaybold"
+        android:fontFamily="sans-serif-smallcaps"
         android:text="Game A : 0"
         android:textColor="@color/black"
-        android:textSize="10sp"
+        android:textSize="12sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/view"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -490,10 +488,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:fontFamily="@font/sfnsdisplaybold"
+        android:fontFamily="sans-serif-smallcaps"
         android:text="Game B : 0"
         android:textColor="@color/black"
-        android:textSize="10sp"
+        android:textSize="12sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/view"
         app:layout_constraintTop_toBottomOf="@+id/tvBestRecordA" />
@@ -504,11 +502,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/outofafrica"
+        android:fontFamily="sans-serif-smallcaps"
         android:paddingEnd="4dp"
         android:text="Speed : 1"
         android:textColor="@color/black"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/view"
         app:layout_constraintTop_toBottomOf="@+id/tvBestRecordB" />
@@ -581,7 +579,7 @@
                 android:id="@+id/tvTrack1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/angrybirdsregular"
+                android:fontFamily="sans-serif-smallcaps"
                 android:padding="2dp"
                 android:text="Track 1"
                 android:textColor="@color/black"
@@ -592,7 +590,7 @@
                 android:id="@+id/tvTrack2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/angrybirdsregular"
+                android:fontFamily="sans-serif-smallcaps"
                 android:padding="2dp"
                 android:text="Track 2"
                 android:textColor="@color/black"
@@ -603,7 +601,7 @@
                 android:id="@+id/tvTrack3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/angrybirdsregular"
+                android:fontFamily="sans-serif-smallcaps"
                 android:padding="2dp"
                 android:text="Track 3"
                 android:textColor="@color/black"
@@ -614,7 +612,7 @@
                 android:id="@+id/tvTrack4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/angrybirdsregular"
+                android:fontFamily="sans-serif-smallcaps"
                 android:padding="2dp"
                 android:text="Track 4"
                 android:textColor="@color/black"
@@ -625,7 +623,7 @@
                 android:id="@+id/tvTrack5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/angrybirdsregular"
+                android:fontFamily="sans-serif-smallcaps"
                 android:padding="2dp"
                 android:text="Track 5"
                 android:textColor="@color/black"
@@ -636,7 +634,7 @@
                 android:id="@+id/tvTrack6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/angrybirdsregular"
+                android:fontFamily="sans-serif-smallcaps"
                 android:padding="2dp"
                 android:text="Track 6"
                 android:textColor="@color/black"
@@ -647,7 +645,7 @@
                 android:id="@+id/tvTrack7"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/angrybirdsregular"
+                android:fontFamily="sans-serif-smallcaps"
                 android:padding="2dp"
                 android:text="Track 7"
                 android:textColor="@color/black"
@@ -655,5 +653,79 @@
                 android:textStyle="bold" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/ivEggRightUpTwo"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/view9"
+        app:layout_constraintEnd_toStartOf="@+id/imageView12"
+        app:srcCompat="@drawable/egg" />
+
+    <ImageView
+        android:id="@+id/ivEggRightDownTwo"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/view7"
+        app:layout_constraintEnd_toStartOf="@+id/imageView9"
+        app:srcCompat="@drawable/egg" />
+
+    <ImageView
+        android:id="@+id/ivEggLeftUpTwo"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/view5"
+        app:layout_constraintStart_toEndOf="@+id/imageView6"
+        app:srcCompat="@drawable/egg" />
+
+    <ImageView
+        android:id="@+id/ivEggLeftDownTwo"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/view3"
+        app:layout_constraintStart_toEndOf="@+id/imageView4"
+        app:srcCompat="@drawable/egg" />
+
+    <ImageView
+        android:id="@+id/ivButterflyOne"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/view"
+        app:srcCompat="@drawable/butbroun" />
+
+    <ImageView
+        android:id="@+id/ivButterflyTwo"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@+id/view"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/butgreen" />
+
+    <ImageView
+        android:id="@+id/ivButterflyThree"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="96dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/butrose" />
+
+    <ImageView
+        android:id="@+id/ivButterflyFour"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="128dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/butwhite" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

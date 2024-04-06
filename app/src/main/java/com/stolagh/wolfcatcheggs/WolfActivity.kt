@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.bumptech.glide.Glide
 import com.stolagh.wolfcatcheggs.databinding.ActivityWolfBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -32,16 +33,26 @@ class WolfActivity : AppCompatActivity() {
     private lateinit var binding : ActivityWolfBinding
     private var coroutineScope = CoroutineScope(Dispatchers.Main + Job())
     private var coroutine : Job? = null
+    private var coroutine2 : Job? = null
+    private var corButOne : Job? = null
+    private var corButTwo : Job? = null
+    private var corButThree : Job? = null
+    private var corButFour : Job? = null
     private var corLUB : Job? = null
     private var corLDB : Job? = null
     private var corRUB : Job? = null
     private var corRDB : Job? = null
     private var corListMusic : Job? = null
     private var coroutineRightDownFall : Job? = null
+    private var coroutineRightDownFallTwo : Job? = null
     private var coroutineRightUpFall : Job? = null
+    private var coroutineRightUpFallTwo : Job? = null
     private var coroutineLeftUpFall : Job? = null
+    private var coroutineLeftUpFallTwo : Job? = null
     private var coroutineLeftDownFall : Job? = null
+    private var coroutineLeftDownFallTwo: Job? = null
     private var press = true
+    private var press2 = true
     private var pressListTracks = false
     private var pressMusic = false
     private var currentRotation = 0f
@@ -49,12 +60,21 @@ class WolfActivity : AppCompatActivity() {
     private var currentTranslationY = 0f
     private var count = 0
     private var bestA = 0
+    private var bestB = 0
     private var speed = 300
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var musicPlay: MediaPlayer
+    private var lastFunction: (() -> Unit)? = null
+    private var newFunction: (() -> Unit)? = null
+    private var lastFunction2: (() -> Unit)? = null
+    private var newFunction2: (() -> Unit)? = null
     private val functions = arrayOf(
         { coroutineRightDownFall() }, { coroutineLeftUpFall() },
         { coroutineRightUpFall() } ,  { coroutineLeftDownFall() }
+    )
+    private val functions2 = arrayOf(
+        { coroutineRightDownFallTwo() }, { coroutineLeftUpFallTwo() },
+        { coroutineRightUpFallTwo() } ,  { coroutineLeftDownFallTwo() }
     )
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,14 +82,26 @@ class WolfActivity : AppCompatActivity() {
         binding = ActivityWolfBinding.inflate(layoutInflater)
         setContentView(binding.root)
         hideSystemUI()
+        butterflies()
+        Glide.with(this).asGif().load(R.drawable.butbroun).into(binding.ivButterflyOne)
+        Glide.with(this).asGif().load(R.drawable.butgreen).into(binding.ivButterflyTwo)
+        Glide.with(this).asGif().load(R.drawable.butrose).into(binding.ivButterflyThree)
+        Glide.with(this).asGif().load(R.drawable.butwhite).into(binding.ivButterflyFour)
+
         binding.cvListMusic.isEnabled = false
-        binding.cvListMusic.alpha = 0.7f
-        sharedPrefs = getSharedPreferences("SaveBestCountA", MODE_PRIVATE)
+        binding.cvListMusic.alpha = 0.8f
+        sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
         bestA = sharedPrefs.getInt("savebestA", 0)
+        bestB = sharedPrefs.getInt("savebestB", 0)
         if(bestA != 0){
             binding.tvBestRecordA.text = "Game A : $bestA"
         } else {
             binding.tvBestRecordA.text = "Game A : $bestA"
+        }
+        if(bestB != 0){
+            binding.tvBestRecordB.text = "Game B : $bestB"
+        } else {
+            binding.tvBestRecordB.text = "Game B : $bestB"
         }
         binding.cvMusic.setOnClickListener {
                 if (!pressMusic) {
@@ -101,7 +133,7 @@ class WolfActivity : AppCompatActivity() {
                     }
                     stopMusic()
                     binding.cvListMusic.isEnabled = false
-                    binding.cvListMusic.alpha = 0.7f
+                    binding.cvListMusic.alpha = 0.8f
                     pressMusic = false
                 }
         }
@@ -125,17 +157,33 @@ class WolfActivity : AppCompatActivity() {
         }
         binding.btGameA.setOnClickListener {
             binding.ivPlayA.visibility = View.VISIBLE
+            binding.ivPlayB.visibility = View.GONE
             binding.tvPlay.visibility = View.VISIBLE
             binding.btGameA.setBackgroundColor(ContextCompat.getColor(this, R.color.white))
             binding.btGameB.setBackgroundColor(ContextCompat.getColor(this, R.color.yellowlight))
-            binding.ivPlayB.visibility = View.GONE
+            binding.ivEggRightDown.visibility = View.GONE
+            binding.ivEggRightUp.visibility = View.GONE
+            binding.ivEggRightDownTwo.visibility = View.GONE
+            binding.ivEggRightUpTwo.visibility = View.GONE
+            binding.ivEggLeftDown.visibility = View.GONE
+            binding.ivEggLeftUp.visibility = View.GONE
+            binding.ivEggLeftDownTwo.visibility = View.GONE
+            binding.ivEggLeftUpTwo.visibility = View.GONE
         }
         binding.btGameB.setOnClickListener {
             binding.ivPlayB.visibility = View.VISIBLE
+            binding.ivPlayA.visibility = View.GONE
             binding.tvPlay.visibility = View.VISIBLE
             binding.btGameB.setBackgroundColor(ContextCompat.getColor(this, R.color.white))
             binding.btGameA.setBackgroundColor(ContextCompat.getColor(this, R.color.yellowlight))
-            binding.ivPlayA.visibility = View.GONE
+            binding.ivEggRightDown.visibility = View.GONE
+            binding.ivEggRightUp.visibility = View.GONE
+            binding.ivEggRightDownTwo.visibility = View.GONE
+            binding.ivEggRightUpTwo.visibility = View.GONE
+            binding.ivEggLeftDown.visibility = View.GONE
+            binding.ivEggLeftUp.visibility = View.GONE
+            binding.ivEggLeftDownTwo.visibility = View.GONE
+            binding.ivEggLeftUpTwo.visibility = View.GONE
         }
         binding.ivPlayA.setOnClickListener {
             if (press) {
@@ -144,6 +192,14 @@ class WolfActivity : AppCompatActivity() {
                 coroutineRightUpFall?.cancel()
                 coroutineLeftDownFall?.cancel()
                 coroutineLeftUpFall?.cancel()
+                binding.ivEggRightDown.visibility = View.GONE
+                binding.ivEggRightUp.visibility = View.GONE
+                binding.ivEggRightDownTwo.visibility = View.GONE
+                binding.ivEggRightUpTwo.visibility = View.GONE
+                binding.ivEggLeftDown.visibility = View.GONE
+                binding.ivEggLeftUp.visibility = View.GONE
+                binding.ivEggLeftDownTwo.visibility = View.GONE
+                binding.ivEggLeftUpTwo.visibility = View.GONE
                 binding.ivEggRightDown.translationX = 0f
                 binding.ivEggRightDown.translationY = 0f
                 binding.ivEggRightUp.translationX = 0f
@@ -153,89 +209,131 @@ class WolfActivity : AppCompatActivity() {
                 binding.ivEggLeftUp.translationX = 0f
                 binding.ivEggLeftUp.translationY = 0f
                 count = 0
+                speed = 300
                 binding.tvCount.text = count.toString()
                 binding.ivPlayA.setImageResource(R.drawable.baseline_stop_24)
                 binding.tvPlay.text = "stop"
                 press = false
+                press2 = true
                 coroutine = coroutineScope.launch {
                     while (true) {
                         if(speed == 300){
+                            launchRandomFunction()
+                            delay((1000..2000).random().toLong())
                             launchRandomFunction()
                             delay(3600)
                         }
                         if(speed == 290){
                            launchRandomFunction()
+                            delay((1000..2000).random().toLong())
+                            launchRandomFunction()
                             delay(3500)
                         }
                         if(speed == 280){
                            launchRandomFunction()
+                            delay((1000..2000).random().toLong())
+                            launchRandomFunction()
                             delay(3400)
                         }
                         if(speed == 270){
                            launchRandomFunction()
+                            delay((1000..2000).random().toLong())
+                            launchRandomFunction()
                             delay(3300)
                         }
                         if(speed == 260){
                            launchRandomFunction()
+                            delay((1000..2000).random().toLong())
+                            launchRandomFunction()
                             delay(3200)
                         }
                         if(speed == 250){
                            launchRandomFunction()
+                            delay((1000..2000).random().toLong())
+                            launchRandomFunction()
                             delay(3100)
                         }
                         if(speed == 240){
                            launchRandomFunction()
+                            delay((1000..2000).random().toLong())
+                            launchRandomFunction()
                             delay(3000)
                         }
                         if(speed == 230){
                            launchRandomFunction()
+                            delay((1000..1900).random().toLong())
+                            launchRandomFunction()
                             delay(2900)
                         }
                         if(speed == 220){
+                            launchRandomFunction()
+                            delay((1000..1800).random().toLong())
                             launchRandomFunction()
                             delay(2800)
                         }
                         if(speed == 210){
                             launchRandomFunction()
+                            delay((1000..1800).random().toLong())
+                            launchRandomFunction()
                             delay(2700)
                         }
                         if(speed == 200){
+                            launchRandomFunction()
+                            delay((1000..1800).random().toLong())
                             launchRandomFunction()
                             delay(2600)
                         }
                         if(speed == 190){
                             launchRandomFunction()
+                            delay((1000..1800).random().toLong())
+                            launchRandomFunction()
                             delay(2500)
                         }
                         if(speed == 180){
+                            launchRandomFunction()
+                            delay((1000..1700).random().toLong())
                             launchRandomFunction()
                             delay(2400)
                         }
                         if(speed == 170){
                             launchRandomFunction()
+                            delay((1000..1700).random().toLong())
+                            launchRandomFunction()
                             delay(2300)
                         }
                         if(speed == 160){
+                            launchRandomFunction()
+                            delay((1000..1600).random().toLong())
                             launchRandomFunction()
                             delay(2200)
                         }
                         if(speed == 150){
                             launchRandomFunction()
+                            delay((1000..1500).random().toLong())
+                            launchRandomFunction()
                             delay(2100)
                         }
                         if(speed == 140){
+                            launchRandomFunction()
+                            delay((1000..1400).random().toLong())
                             launchRandomFunction()
                             delay(2000)
                         }
                         if(speed == 130){
                             launchRandomFunction()
+                            delay((1000..1300).random().toLong())
+                            launchRandomFunction()
                             delay(1900)
                         }
                         if(speed == 120){
                             launchRandomFunction()
+                            delay((1000..1300).random().toLong())
+                            launchRandomFunction()
                             delay(1800)
                         }
                         if(speed == 110){
+                            launchRandomFunction()
+                            delay((1000..1300).random().toLong())
                             launchRandomFunction()
                             delay(1700)
                         }
@@ -246,7 +344,7 @@ class WolfActivity : AppCompatActivity() {
                     bestA = count
                     binding.tvBestRecordA.text = "Game A : $bestA"
                 }
-                sharedPrefs = getSharedPreferences("SaveBestCountA", MODE_PRIVATE)
+                sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
                 val editor = sharedPrefs.edit()
                 editor?.putInt("savebestA", bestA)
                 editor?.apply()
@@ -273,6 +371,294 @@ class WolfActivity : AppCompatActivity() {
             }
         }
         binding.ivPlayB.setOnClickListener {
+            if (press2) {
+                coroutine?.cancel()
+                coroutine2?.cancel()
+                coroutineRightDownFall?.cancel()
+                coroutineRightUpFall?.cancel()
+                coroutineLeftDownFall?.cancel()
+                coroutineLeftUpFall?.cancel()
+                coroutineRightDownFallTwo?.cancel()
+                coroutineRightUpFallTwo?.cancel()
+                coroutineLeftDownFallTwo?.cancel()
+                coroutineLeftUpFallTwo?.cancel()
+                binding.ivEggRightDown.visibility = View.GONE
+                binding.ivEggRightUp.visibility = View.GONE
+                binding.ivEggRightDownTwo.visibility = View.GONE
+                binding.ivEggRightUpTwo.visibility = View.GONE
+                binding.ivEggLeftDown.visibility = View.GONE
+                binding.ivEggLeftUp.visibility = View.GONE
+                binding.ivEggLeftDownTwo.visibility = View.GONE
+                binding.ivEggLeftUpTwo.visibility = View.GONE
+                binding.ivEggRightDown.translationX = 0f
+                binding.ivEggRightDown.translationY = 0f
+                binding.ivEggRightUp.translationX = 0f
+                binding.ivEggRightUp.translationY = 0f
+                binding.ivEggLeftDown.translationX = 0f
+                binding.ivEggLeftDown.translationY = 0f
+                binding.ivEggLeftUp.translationX = 0f
+                binding.ivEggLeftUp.translationY = 0f
+                binding.ivEggRightDownTwo.translationX = 0f
+                binding.ivEggRightDownTwo.translationY = 0f
+                binding.ivEggRightUpTwo.translationX = 0f
+                binding.ivEggRightUpTwo.translationY = 0f
+                binding.ivEggLeftDownTwo.translationX = 0f
+                binding.ivEggLeftDownTwo.translationY = 0f
+                binding.ivEggLeftUpTwo.translationX = 0f
+                binding.ivEggLeftUpTwo.translationY = 0f
+                count = 0
+                speed = 300
+                binding.tvCount.text = count.toString()
+                binding.ivPlayB.setImageResource(R.drawable.baseline_stop_24)
+                binding.tvPlay.text = "stop"
+                press2 = false
+                coroutine2 = coroutineScope.launch {
+                    while (true) {
+                        if(speed == 300){
+                            launchRandomFunction()
+                            delay((700..1500).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(1200)
+                            launchRandomFunction()
+                            delay((500..900).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(3600)
+                        }
+                        if(speed == 290){
+                            launchRandomFunction()
+                            delay((700..1450).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(1150)
+                            launchRandomFunction()
+                            delay((500..900).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(3500)
+                        }
+                        if(speed == 280){
+                            launchRandomFunction()
+                            delay((700..1400).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(1100)
+                            launchRandomFunction()
+                            delay((500..900).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(3400)
+                        }
+                        if(speed == 270){
+                            launchRandomFunction()
+                            delay((700..1350).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(1050)
+                            launchRandomFunction()
+                            delay((500..900).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(3300)
+                        }
+                        if(speed == 260){
+                            launchRandomFunction()
+                            delay((700..1300).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(1000)
+                            launchRandomFunction()
+                            delay((500..900).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(3200)
+                        }
+                        if(speed == 250){
+                            launchRandomFunction()
+                            delay((700..1250).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(950)
+                            launchRandomFunction()
+                            delay((500..900).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(3100)
+                        }
+                        if(speed == 240){
+                            launchRandomFunction()
+                            delay((700..1200).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(900)
+                            launchRandomFunction()
+                            delay((500..900).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(3000)
+                        }
+                        if(speed == 230){
+                            launchRandomFunction()
+                            delay((700..1150).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(850)
+                            launchRandomFunction()
+                            delay((500..900).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(2900)
+                        }
+                        if(speed == 220){
+                            launchRandomFunction()
+                            delay((700..1100).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(800)
+                            launchRandomFunction()
+                            delay((500..900).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(2800)
+                        }
+                        if(speed == 210){
+                            launchRandomFunction()
+                            delay((700..1050).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(800)
+                            launchRandomFunction()
+                            delay((500..850).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(2700)
+                        }
+                        if(speed == 200){
+                            launchRandomFunction()
+                            delay((700..1000).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(800)
+                            launchRandomFunction()
+                            delay((500..800).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(2600)
+                        }
+                        if(speed == 190){
+                            launchRandomFunction()
+                            delay((700..950).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(750)
+                            launchRandomFunction()
+                            delay((500..800).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(2500)
+                        }
+                        if(speed == 180){
+                            launchRandomFunction()
+                            delay((700..900).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(700)
+                            launchRandomFunction()
+                            delay((500..800).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(2400)
+                        }
+                        if(speed == 170){
+                            launchRandomFunction()
+                            delay((700..850).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(700)
+                            launchRandomFunction()
+                            delay((500..750).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(2300)
+                        }
+                        if(speed == 160){
+                            launchRandomFunction()
+                            delay((700..800).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(700)
+                            launchRandomFunction()
+                            delay((500..700).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(2200)
+                        }
+                        if(speed == 150){
+                            launchRandomFunction()
+                            delay((700..750).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(650)
+                            launchRandomFunction()
+                            delay((500..700).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(2100)
+                        }
+                        if(speed == 140){
+                            launchRandomFunction()
+                            delay((500..650).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(700)
+                            launchRandomFunction()
+                            delay((500..650).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(2000)
+                        }
+                        if(speed == 130){
+                            launchRandomFunction()
+                            delay((500..600).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(700)
+                            launchRandomFunction()
+                            delay((500..600).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(1900)
+                        }
+                        if(speed == 120){
+                            launchRandomFunction()
+                            delay((500..600).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(600)
+                            launchRandomFunction()
+                            delay((500..600).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(1800)
+                        }
+                        if(speed == 110){
+                            launchRandomFunction()
+                            delay((500..550).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(600)
+                            launchRandomFunction()
+                            delay((500..550).random().toLong())
+                            launchRandomFunctionTwo()
+                            delay(1700)
+                        }
+                    }
+                }
+            } else {
+                if(count > bestB){
+                    bestB = count
+                    binding.tvBestRecordB.text = "Game B : $bestB"
+                }
+                sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                val editor = sharedPrefs.edit()
+                editor?.putInt("savebestB", bestB)
+                editor?.apply()
+                count = 0
+                binding.tvCount.text = count.toString()
+                binding.ivPlayB.setImageResource(R.drawable.baseline_play_arrow_24)
+                binding.tvPlay.text = " play"
+                press2 = true
+                binding.ivSmashEggRight.visibility = View.GONE
+                binding.ivSmashEggLeft.visibility = View.GONE
+                binding.ivEggRightDown.translationX = 0f
+                binding.ivEggRightDown.translationY = 0f
+                binding.ivEggRightUp.translationX = 0f
+                binding.ivEggRightUp.translationY = 0f
+                binding.ivEggLeftDown.translationX = 0f
+                binding.ivEggLeftDown.translationY = 0f
+                binding.ivEggLeftUp.translationX = 0f
+                binding.ivEggLeftUp.translationY = 0f
+                binding.ivEggRightDownTwo.translationX = 0f
+                binding.ivEggRightDownTwo.translationY = 0f
+                binding.ivEggRightUpTwo.translationX = 0f
+                binding.ivEggRightUpTwo.translationY = 0f
+                binding.ivEggLeftDownTwo.translationX = 0f
+                binding.ivEggLeftDownTwo.translationY = 0f
+                binding.ivEggLeftUpTwo.translationX = 0f
+                binding.ivEggLeftUpTwo.translationY = 0f
+                coroutine?.cancel()
+                coroutine2?.cancel()
+                coroutineRightDownFall?.cancel()
+                coroutineRightUpFall?.cancel()
+                coroutineLeftDownFall?.cancel()
+                coroutineLeftUpFall?.cancel()
+                coroutineRightDownFallTwo?.cancel()
+                coroutineRightUpFallTwo?.cancel()
+                coroutineLeftDownFallTwo?.cancel()
+                coroutineLeftUpFallTwo?.cancel()
+            }
         }
         binding.btRightDown.setOnClickListener {
             binding.ivWolfRightDown.visibility = View.VISIBLE
@@ -445,6 +831,8 @@ class WolfActivity : AppCompatActivity() {
                 eggToLeftDown()
                 delay(speed.toLong())
                 eggToLeftDown()
+            delay(speed.toLong())
+            eggToLeftDown()
                 if (binding.ivWolfRightDown.visibility == View.VISIBLE) {
                     rightDownCollision()
                 } else {
@@ -453,28 +841,54 @@ class WolfActivity : AppCompatActivity() {
                     delay(speed.toLong())
                     binding.ivEggRightDown.visibility = View.GONE
                     binding.ivSmashEggRight.visibility = View.VISIBLE
-                    if(count > bestA){
-                        bestA = count
-                        binding.tvBestRecordA.text = "Game A : $bestA"
+                    if (press2 == false && press == true){
+                        if(count > bestB){
+                            bestB = count
+                            binding.tvBestRecordB.text = "Game B : $bestB"
+                        }
+                        sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                        val editor = sharedPrefs.edit()
+                        editor?.putInt("savebestB", bestB)
+                        editor?.apply()
                     }
-                    sharedPrefs = getSharedPreferences("SaveBestCountA", MODE_PRIVATE)
-                    val editor = sharedPrefs.edit()
-                    editor?.putInt("savebestA", bestA)
-                    editor?.apply()
+                    if(press == false && press2 == true){
+                        if(count > bestA){
+                            bestA = count
+                            binding.tvBestRecordA.text = "Game A : $bestA"
+                        }
+                        sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                        val editor = sharedPrefs.edit()
+                        editor?.putInt("savebestA", bestA)
+                        editor?.apply()
+                    }
                     delay(speed.toLong())
                     count = 0
                     binding.tvCount.text = count.toString()
                     binding.ivPlayA.setImageResource(R.drawable.baseline_play_arrow_24)
+                    binding.ivPlayB.setImageResource(R.drawable.baseline_play_arrow_24)
                     binding.tvPlay.text = " play"
                     press = true
                     binding.ivSmashEggRight.visibility = View.GONE
                     binding.ivEggRightDown.translationX = 0f
                     binding.ivEggRightDown.translationY = 0f
+                    binding.ivEggRightDown.visibility = View.GONE
+                    binding.ivEggRightUp.visibility = View.GONE
+                    binding.ivEggRightDownTwo.visibility = View.GONE
+                    binding.ivEggRightUpTwo.visibility = View.GONE
+                    binding.ivEggLeftDown.visibility = View.GONE
+                    binding.ivEggLeftUp.visibility = View.GONE
+                    binding.ivEggLeftDownTwo.visibility = View.GONE
+                    binding.ivEggLeftUpTwo.visibility = View.GONE
                     coroutineRightUpFall?.cancel()
                     coroutineRightDownFall?.cancel()
                     coroutineLeftUpFall?.cancel()
                     coroutineLeftDownFall?.cancel()
+                    coroutineRightUpFallTwo?.cancel()
+                    coroutineRightDownFallTwo?.cancel()
+                    coroutineLeftUpFallTwo?.cancel()
+                    coroutineLeftDownFallTwo?.cancel()
                     coroutine?.cancel()
+                    coroutine2?.cancel()
                 }
         }
     }
@@ -501,6 +915,8 @@ class WolfActivity : AppCompatActivity() {
                 eggToRightDown()
                 delay(speed.toLong())
                 eggToRightDown()
+            delay(speed.toLong())
+            eggToRightDown()
                 if (binding.ivWolfLeftDown.visibility == View.VISIBLE) {
                     leftDownCollision()
                 } else {
@@ -509,29 +925,54 @@ class WolfActivity : AppCompatActivity() {
                     delay(speed.toLong())
                     binding.ivEggLeftDown.visibility = View.GONE
                     binding.ivSmashEggLeft.visibility = View.VISIBLE
-                    if(count > bestA){
-                        bestA = count
-                        binding.tvBestRecordA.text = "Game A : $bestA"
+                    if (press2 == false && press == true){
+                        if(count > bestB){
+                            bestB = count
+                            binding.tvBestRecordB.text = "Game B : $bestB"
+                        }
+                        sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                        val editor = sharedPrefs.edit()
+                        editor?.putInt("savebestB", bestB)
+                        editor?.apply()
                     }
-                    sharedPrefs = getSharedPreferences("SaveBestCountA", MODE_PRIVATE)
-                    val editor = sharedPrefs.edit()
-                    editor?.putInt("savebestA", bestA)
-                    editor?.apply()
+                    if(press == false && press2 == true){
+                        if(count > bestA){
+                            bestA = count
+                            binding.tvBestRecordA.text = "Game A : $bestA"
+                        }
+                        sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                        val editor = sharedPrefs.edit()
+                        editor?.putInt("savebestA", bestA)
+                        editor?.apply()
+                    }
                     delay(speed.toLong())
                     count = 0
                     binding.tvCount.text = count.toString()
                     binding.ivPlayA.setImageResource(R.drawable.baseline_play_arrow_24)
+                    binding.ivPlayB.setImageResource(R.drawable.baseline_play_arrow_24)
                     binding.tvPlay.text = " play"
                     press = true
-                    //binding.ivEggLeftDown.visibility = View.VISIBLE
                     binding.ivSmashEggLeft.visibility = View.GONE
                     binding.ivEggLeftDown.translationX = 0f
                     binding.ivEggLeftDown.translationY = 0f
+                    binding.ivEggRightDown.visibility = View.GONE
+                    binding.ivEggRightUp.visibility = View.GONE
+                    binding.ivEggRightDownTwo.visibility = View.GONE
+                    binding.ivEggRightUpTwo.visibility = View.GONE
+                    binding.ivEggLeftDown.visibility = View.GONE
+                    binding.ivEggLeftUp.visibility = View.GONE
+                    binding.ivEggLeftDownTwo.visibility = View.GONE
+                    binding.ivEggLeftUpTwo.visibility = View.GONE
                     coroutineRightUpFall?.cancel()
                     coroutineRightDownFall?.cancel()
                     coroutineLeftUpFall?.cancel()
                     coroutineLeftDownFall?.cancel()
+                    coroutineRightUpFallTwo?.cancel()
+                    coroutineRightDownFallTwo?.cancel()
+                    coroutineLeftUpFallTwo?.cancel()
+                    coroutineLeftDownFallTwo?.cancel()
                     coroutine?.cancel()
+                    coroutine2?.cancel()
                 }
         }
     }
@@ -570,27 +1011,53 @@ class WolfActivity : AppCompatActivity() {
                     delay(speed.toLong())
                     binding.ivEggRightUp.visibility = View.GONE
                     binding.ivSmashEggRight.visibility = View.VISIBLE
-                    if(count > bestA){
-                        bestA = count
-                        binding.tvBestRecordA.text = "Game A : $bestA"
+                    if (press2 == false && press == true){
+                        if(count > bestB){
+                            bestB = count
+                            binding.tvBestRecordB.text = "Game B : $bestB"
+                        }
+                        sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                        val editor = sharedPrefs.edit()
+                        editor?.putInt("savebestB", bestB)
+                        editor?.apply()
                     }
-                    sharedPrefs = getSharedPreferences("SaveBestCountA", MODE_PRIVATE)
-                    val editor = sharedPrefs.edit()
-                    editor?.putInt("savebestA", bestA)
-                    editor?.apply()
+                    if(press == false && press2 == true){
+                        if(count > bestA){
+                            bestA = count
+                            binding.tvBestRecordA.text = "Game A : $bestA"
+                        }
+                        sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                        val editor = sharedPrefs.edit()
+                        editor?.putInt("savebestA", bestA)
+                        editor?.apply()
+                    }
                     delay(speed.toLong())
                     count = 0
                     binding.tvCount.text = count.toString()
                     binding.ivPlayA.setImageResource(R.drawable.baseline_play_arrow_24)
+                    binding.ivPlayB.setImageResource(R.drawable.baseline_play_arrow_24)
                     binding.tvPlay.text = " play"
                     press = true
                     binding.ivEggRightUp.translationX = 0f
                     binding.ivEggRightUp.translationY = 0f
+                    binding.ivEggRightDown.visibility = View.GONE
+                    binding.ivEggRightUp.visibility = View.GONE
+                    binding.ivEggRightDownTwo.visibility = View.GONE
+                    binding.ivEggRightUpTwo.visibility = View.GONE
+                    binding.ivEggLeftDown.visibility = View.GONE
+                    binding.ivEggLeftUp.visibility = View.GONE
+                    binding.ivEggLeftDownTwo.visibility = View.GONE
+                    binding.ivEggLeftUpTwo.visibility = View.GONE
                     coroutineRightUpFall?.cancel()
                     coroutineRightDownFall?.cancel()
                     coroutineLeftUpFall?.cancel()
                     coroutineLeftDownFall?.cancel()
+                    coroutineRightUpFallTwo?.cancel()
+                    coroutineRightDownFallTwo?.cancel()
+                    coroutineLeftUpFallTwo?.cancel()
+                    coroutineLeftDownFallTwo?.cancel()
                     coroutine?.cancel()
+                    coroutine2?.cancel()
                 }
         }
     }
@@ -629,35 +1096,356 @@ class WolfActivity : AppCompatActivity() {
                     delay(speed.toLong())
                     binding.ivEggLeftUp.visibility = View.GONE
                     binding.ivSmashEggLeft.visibility = View.VISIBLE
-                    if(count > bestA){
-                        bestA = count
-                        binding.tvBestRecordA.text = "Game A : $bestA"
+                    if (press2 == false && press == true){
+                        if(count > bestB){
+                            bestB = count
+                            binding.tvBestRecordB.text = "Game B : $bestB"
+                        }
+                        sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                        val editor = sharedPrefs.edit()
+                        editor?.putInt("savebestB", bestB)
+                        editor?.apply()
                     }
-                    sharedPrefs = getSharedPreferences("SaveBestCountA", MODE_PRIVATE)
-                    val editor = sharedPrefs.edit()
-                    editor?.putInt("savebestA", bestA)
-                    editor?.apply()
+                    if(press == false && press2 == true){
+                        if(count > bestA){
+                            bestA = count
+                            binding.tvBestRecordA.text = "Game A : $bestA"
+                        }
+                        sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                        val editor = sharedPrefs.edit()
+                        editor?.putInt("savebestA", bestA)
+                        editor?.apply()
+                    }
                     delay(speed.toLong())
                     count = 0
                     binding.tvCount.text = count.toString()
                     binding.ivPlayA.setImageResource(R.drawable.baseline_play_arrow_24)
+                    binding.ivPlayB.setImageResource(R.drawable.baseline_play_arrow_24)
                     binding.tvPlay.text = " play"
                     press = true
                     binding.ivEggLeftUp.translationX = 0f
                     binding.ivEggLeftUp.translationY = 0f
+                    binding.ivEggRightDown.visibility = View.GONE
+                    binding.ivEggRightUp.visibility = View.GONE
+                    binding.ivEggRightDownTwo.visibility = View.GONE
+                    binding.ivEggRightUpTwo.visibility = View.GONE
+                    binding.ivEggLeftDown.visibility = View.GONE
+                    binding.ivEggLeftUp.visibility = View.GONE
+                    binding.ivEggLeftDownTwo.visibility = View.GONE
+                    binding.ivEggLeftUpTwo.visibility = View.GONE
                     coroutineRightUpFall?.cancel()
                     coroutineRightDownFall?.cancel()
                     coroutineLeftUpFall?.cancel()
                     coroutineLeftDownFall?.cancel()
+                    coroutineRightUpFallTwo?.cancel()
+                    coroutineRightDownFallTwo?.cancel()
+                    coroutineLeftUpFallTwo?.cancel()
+                    coroutineLeftDownFallTwo?.cancel()
                     coroutine?.cancel()
+                    coroutine2?.cancel()
                 }
         }
     }
-    private fun CoroutineScope.launchRandomFunction() = launch {
-            val function = functions.random()
-            function()
+    @SuppressLint("SetTextI18n")
+    private fun coroutineRightDownFallTwo(){
+        coroutineRightDownFallTwo?.cancel()
+        coroutineRightDownFallTwo = coroutineScope.launch {
+            binding.ivEggRightDownTwo.visibility = View.VISIBLE
+            binding.ivSmashEggRight.visibility = View.GONE
+            binding.ivEggRightDownTwo.translationX = 0f
+            binding.ivEggRightDownTwo.translationY = 0f
+            eggToLeftTwo()
+            delay(speed.toLong())
+            eggToLeftTwo()
+            delay(speed.toLong())
+            eggToLeftTwo()
+            delay(speed.toLong())
+            eggToLeftTwo()
+            delay(speed.toLong())
+            eggToLeftDownTwo()
+            delay(speed.toLong())
+            eggToLeftDownTwo()
+            delay(speed.toLong())
+            eggToLeftDownTwo()
+            delay(speed.toLong())
+            eggToLeftDownTwo()
+            delay(speed.toLong())
+            eggToLeftDownTwo()
+            if (binding.ivWolfRightDown.visibility == View.VISIBLE) {
+                rightDownCollisionTwo()
+            } else {
+                delay(speed.toLong())
+                eggToLeftDownSmashUpTwo()
+                delay(speed.toLong())
+                binding.ivEggRightDownTwo.visibility = View.GONE
+                binding.ivSmashEggRight.visibility = View.VISIBLE
+                if(count > bestB){
+                    bestB = count
+                    binding.tvBestRecordB.text = "Game B : $bestB"
+                }
+                sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                val editor = sharedPrefs.edit()
+                editor?.putInt("savebestB", bestB)
+                editor?.apply()
+                delay(speed.toLong())
+                count = 0
+                binding.tvCount.text = count.toString()
+                binding.ivPlayB.setImageResource(R.drawable.baseline_play_arrow_24)
+                binding.tvPlay.text = " play"
+                press2 = true
+                binding.ivSmashEggRight.visibility = View.GONE
+                binding.ivEggRightDownTwo.translationX = 0f
+                binding.ivEggRightDownTwo.translationY = 0f
+                binding.ivEggRightDown.visibility = View.GONE
+                binding.ivEggRightUp.visibility = View.GONE
+                binding.ivEggRightDownTwo.visibility = View.GONE
+                binding.ivEggRightUpTwo.visibility = View.GONE
+                binding.ivEggLeftDown.visibility = View.GONE
+                binding.ivEggLeftUp.visibility = View.GONE
+                binding.ivEggLeftDownTwo.visibility = View.GONE
+                binding.ivEggLeftUpTwo.visibility = View.GONE
+                coroutineRightUpFall?.cancel()
+                coroutineRightDownFall?.cancel()
+                coroutineLeftUpFall?.cancel()
+                coroutineLeftDownFall?.cancel()
+                coroutineRightUpFallTwo?.cancel()
+                coroutineRightDownFallTwo?.cancel()
+                coroutineLeftUpFallTwo?.cancel()
+                coroutineLeftDownFallTwo?.cancel()
+                coroutine?.cancel()
+                coroutine2?.cancel()
+            }
+        }
     }
-
+    @SuppressLint("SetTextI18n")
+    private fun coroutineLeftDownFallTwo(){
+        coroutineLeftDownFallTwo?.cancel()
+        coroutineLeftDownFallTwo = coroutineScope.launch {
+            binding.ivEggLeftDownTwo.visibility = View.VISIBLE
+            binding.ivSmashEggLeft.visibility = View.GONE
+            binding.ivEggLeftDownTwo.translationX = 0f
+            binding.ivEggLeftDownTwo.translationY = 0f
+            eggToRightTwo()
+            delay(speed.toLong())
+            eggToRightTwo()
+            delay(speed.toLong())
+            eggToRightTwo()
+            delay(speed.toLong())
+            eggToRightTwo()
+            delay(speed.toLong())
+            eggToRightDownTwo()
+            delay(speed.toLong())
+            eggToRightDownTwo()
+            delay(speed.toLong())
+            eggToRightDownTwo()
+            delay(speed.toLong())
+            eggToRightDownTwo()
+            delay(speed.toLong())
+            eggToRightDownTwo()
+            if (binding.ivWolfLeftDown.visibility == View.VISIBLE) {
+                leftDownCollisionTwo()
+            } else {
+                delay(speed.toLong())
+                eggToRightDownSmashUpTwo()
+                delay(speed.toLong())
+                binding.ivEggLeftDownTwo.visibility = View.GONE
+                binding.ivSmashEggLeft.visibility = View.VISIBLE
+                if(count > bestB){
+                    bestB = count
+                    binding.tvBestRecordB.text = "Game B : $bestB"
+                }
+                sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                val editor = sharedPrefs.edit()
+                editor?.putInt("savebestB", bestB)
+                editor?.apply()
+                delay(speed.toLong())
+                count = 0
+                binding.tvCount.text = count.toString()
+                binding.ivPlayB.setImageResource(R.drawable.baseline_play_arrow_24)
+                binding.tvPlay.text = " play"
+                press2 = true
+                binding.ivSmashEggLeft.visibility = View.GONE
+                binding.ivEggLeftDownTwo.translationX = 0f
+                binding.ivEggLeftDownTwo.translationY = 0f
+                binding.ivEggRightDown.visibility = View.GONE
+                binding.ivEggRightUp.visibility = View.GONE
+                binding.ivEggRightDownTwo.visibility = View.GONE
+                binding.ivEggRightUpTwo.visibility = View.GONE
+                binding.ivEggLeftDown.visibility = View.GONE
+                binding.ivEggLeftUp.visibility = View.GONE
+                binding.ivEggLeftDownTwo.visibility = View.GONE
+                binding.ivEggLeftUpTwo.visibility = View.GONE
+                coroutineRightUpFall?.cancel()
+                coroutineRightDownFall?.cancel()
+                coroutineLeftUpFall?.cancel()
+                coroutineLeftDownFall?.cancel()
+                coroutineRightUpFallTwo?.cancel()
+                coroutineRightDownFallTwo?.cancel()
+                coroutineLeftUpFallTwo?.cancel()
+                coroutineLeftDownFallTwo?.cancel()
+                coroutine?.cancel()
+                coroutine2?.cancel()
+            }
+        }
+    }
+    @SuppressLint("SetTextI18n")
+    private fun coroutineRightUpFallTwo(){
+        coroutineRightUpFallTwo?.cancel()
+        coroutineRightUpFallTwo = coroutineScope.launch {
+            binding.ivEggRightUpTwo.visibility = View.VISIBLE
+            binding.ivSmashEggRight.visibility = View.GONE
+            binding.ivEggRightUpTwo.translationX = 0f
+            binding.ivEggRightUpTwo.translationY = 0f
+            eggToLeftUpsTwo()
+            delay(speed.toLong())
+            eggToLeftUpsTwo()
+            delay(speed.toLong())
+            eggToLeftUpsTwo()
+            delay(speed.toLong())
+            eggToLeftUpsTwo()
+            delay(speed.toLong())
+            eggToLeftUpTwo()
+            delay(speed.toLong())
+            eggToLeftUpTwo()
+            delay(speed.toLong())
+            eggToLeftUpTwo()
+            delay(speed.toLong())
+            eggToLeftUpTwo()
+            delay(speed.toLong())
+            eggToLeftUpTwo()
+            delay(speed.toLong())
+            eggToLeftUpTwo()
+            if (binding.ivWolfRightUp.visibility == View.VISIBLE) {
+                rightUpCollisionTwo()
+            } else {
+                delay(speed.toLong())
+                eggToLeftUpSmashUpTwo()
+                delay(speed.toLong())
+                binding.ivEggRightUp.visibility = View.GONE
+                binding.ivSmashEggRight.visibility = View.VISIBLE
+                if(count > bestB){
+                    bestB = count
+                    binding.tvBestRecordB.text = "Game B : $bestB"
+                }
+                sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                val editor = sharedPrefs.edit()
+                editor?.putInt("savebestB", bestB)
+                editor?.apply()
+                delay(speed.toLong())
+                count = 0
+                binding.tvCount.text = count.toString()
+                binding.ivPlayB.setImageResource(R.drawable.baseline_play_arrow_24)
+                binding.tvPlay.text = " play"
+                press2 = true
+                binding.ivEggRightUpTwo.translationX = 0f
+                binding.ivEggRightUpTwo.translationY = 0f
+                binding.ivEggRightDown.visibility = View.GONE
+                binding.ivEggRightUp.visibility = View.GONE
+                binding.ivEggRightDownTwo.visibility = View.GONE
+                binding.ivEggRightUpTwo.visibility = View.GONE
+                binding.ivEggLeftDown.visibility = View.GONE
+                binding.ivEggLeftUp.visibility = View.GONE
+                binding.ivEggLeftDownTwo.visibility = View.GONE
+                binding.ivEggLeftUpTwo.visibility = View.GONE
+                coroutineRightUpFall?.cancel()
+                coroutineRightDownFall?.cancel()
+                coroutineLeftUpFall?.cancel()
+                coroutineLeftDownFall?.cancel()
+                coroutineRightUpFallTwo?.cancel()
+                coroutineRightDownFallTwo?.cancel()
+                coroutineLeftUpFallTwo?.cancel()
+                coroutineLeftDownFallTwo?.cancel()
+                coroutine?.cancel()
+                coroutine2?.cancel()
+            }
+        }
+    }
+    @SuppressLint("SetTextI18n")
+    private fun coroutineLeftUpFallTwo(){
+        coroutineLeftUpFallTwo?.cancel()
+        coroutineLeftUpFallTwo = coroutineScope.launch {
+            binding.ivEggLeftUpTwo.visibility = View.VISIBLE
+            binding.ivSmashEggLeft.visibility = View.GONE
+            binding.ivEggLeftUpTwo.translationX = 0f
+            binding.ivEggLeftUpTwo.translationY = 0f
+            eggToRightUpsTwo()
+            delay(speed.toLong())
+            eggToRightUpsTwo()
+            delay(speed.toLong())
+            eggToRightUpsTwo()
+            delay(speed.toLong())
+            eggToRightUpsTwo()
+            delay(speed.toLong())
+            eggToRightUpTwo()
+            delay(speed.toLong())
+            eggToRightUpTwo()
+            delay(speed.toLong())
+            eggToRightUpTwo()
+            delay(speed.toLong())
+            eggToRightUpTwo()
+            delay(speed.toLong())
+            eggToRightUpTwo()
+            delay(speed.toLong())
+            eggToRightUpTwo()
+            if (binding.ivWolfLeftUp.visibility == View.VISIBLE) {
+                leftUpCollisionTwo()
+            } else {
+                delay(speed.toLong())
+                eggToRightUpSmashUpTwo()
+                delay(speed.toLong())
+                binding.ivEggLeftUpTwo.visibility = View.GONE
+                binding.ivSmashEggLeft.visibility = View.VISIBLE
+                if(count > bestB){
+                    bestB = count
+                    binding.tvBestRecordB.text = "Game B : $bestB"
+                }
+                sharedPrefs = getSharedPreferences("SaveBestCount", MODE_PRIVATE)
+                val editor = sharedPrefs.edit()
+                editor?.putInt("savebestB", bestB)
+                editor?.apply()
+                delay(speed.toLong())
+                count = 0
+                binding.tvCount.text = count.toString()
+                binding.ivPlayB.setImageResource(R.drawable.baseline_play_arrow_24)
+                binding.tvPlay.text = " play"
+                press2 = true
+                binding.ivEggLeftUpTwo.translationX = 0f
+                binding.ivEggLeftUpTwo.translationY = 0f
+                binding.ivEggRightDown.visibility = View.GONE
+                binding.ivEggRightUp.visibility = View.GONE
+                binding.ivEggRightDownTwo.visibility = View.GONE
+                binding.ivEggRightUpTwo.visibility = View.GONE
+                binding.ivEggLeftDown.visibility = View.GONE
+                binding.ivEggLeftUp.visibility = View.GONE
+                binding.ivEggLeftDownTwo.visibility = View.GONE
+                binding.ivEggLeftUpTwo.visibility = View.GONE
+                coroutineRightUpFall?.cancel()
+                coroutineRightDownFall?.cancel()
+                coroutineLeftUpFall?.cancel()
+                coroutineLeftDownFall?.cancel()
+                coroutineRightUpFallTwo?.cancel()
+                coroutineRightDownFallTwo?.cancel()
+                coroutineLeftUpFallTwo?.cancel()
+                coroutineLeftDownFallTwo?.cancel()
+                coroutine?.cancel()
+                coroutine2?.cancel()
+            }
+        }
+    }
+    private fun CoroutineScope.launchRandomFunction() = launch {
+        do {
+            newFunction = functions.random()
+        } while (newFunction == lastFunction)
+        lastFunction = newFunction
+        newFunction?.invoke()
+}
+    private fun CoroutineScope.launchRandomFunctionTwo() = launch {
+        do {
+            newFunction2 = functions2.random()
+        } while (newFunction2 == lastFunction2)
+        lastFunction2 = newFunction2
+        newFunction2?.invoke()
+    }
     private fun showTable(){
         val animation = ScaleAnimation(1f, 1f, 0f, 1f,
             Animation.RELATIVE_TO_SELF, 0.5f,
@@ -722,6 +1510,151 @@ class WolfActivity : AppCompatActivity() {
         stopMusic()
         releaseMusicPlay()
     }
+
+
+    private fun butterflyOne(){
+        binding.ivButterflyOne.visibility = View.VISIBLE
+        corButOne = coroutineScope.launch {
+            ObjectAnimator.ofFloat(binding.ivButterflyOne, "translationX", 200f).apply {
+                duration = 3000
+                start()
+            }
+            ObjectAnimator.ofFloat(binding.ivButterflyOne, "translationY", -200f).apply {
+                duration = 3000
+                start()
+            }
+            delay(200)
+            ObjectAnimator.ofFloat(binding.ivButterflyOne, "translationX", 2200f).apply {
+                duration = 9000
+                start()
+            }
+            ObjectAnimator.ofFloat(binding.ivButterflyOne, "translationY", -800f).apply {
+                duration = 9000
+                start()
+            }
+            delay(200)
+            corButOne?.cancel()
+        }
+    }
+    private fun butterflyTwo(){
+        binding.ivButterflyTwo.visibility = View.VISIBLE
+        corButTwo = coroutineScope.launch {
+            ObjectAnimator.ofFloat(binding.ivButterflyTwo, "translationX", 300f).apply {
+                duration = 4000
+                start()
+            }
+            ObjectAnimator.ofFloat(binding.ivButterflyTwo, "translationY", 300f).apply {
+                duration = 4000
+                start()
+            }
+            delay(200)
+            ObjectAnimator.ofFloat(binding.ivButterflyTwo, "translationX", 2200f).apply {
+                duration = 11000
+                start()
+            }
+            ObjectAnimator.ofFloat(binding.ivButterflyTwo, "translationY", 600f).apply {
+                duration = 11000
+                start()
+            }
+            delay(200)
+            corButTwo?.cancel()
+        }
+    }
+    private fun butterflyThree(){
+        binding.ivButterflyThree.visibility = View.VISIBLE
+        corButThree = coroutineScope.launch {
+            ObjectAnimator.ofFloat(binding.ivButterflyThree, "translationX", -500f).apply {
+                duration = 6000
+                start()
+            }
+            ObjectAnimator.ofFloat(binding.ivButterflyThree, "translationY", 200f).apply {
+                duration = 6000
+                start()
+            }
+            delay(200)
+            ObjectAnimator.ofFloat(binding.ivButterflyThree, "translationX", -2500f).apply {
+                duration = 13000
+                start()
+            }
+            ObjectAnimator.ofFloat(binding.ivButterflyThree, "translationY", 700f).apply {
+                duration = 13000
+                start()
+            }
+            delay(200)
+            corButThree?.cancel()
+        }
+    }
+    private fun butterflyFour(){
+        binding.ivButterflyFour.visibility = View.VISIBLE
+        corButFour = coroutineScope.launch {
+            ObjectAnimator.ofFloat(binding.ivButterflyFour, "translationX", -150f).apply {
+                duration = 4000
+                start()
+            }
+            ObjectAnimator.ofFloat(binding.ivButterflyFour, "translationY", -400f).apply {
+                duration = 4000
+                start()
+            }
+            delay(200)
+            ObjectAnimator.ofFloat(binding.ivButterflyFour, "translationX", -2200f).apply {
+                duration = 15000
+                start()
+            }
+            ObjectAnimator.ofFloat(binding.ivButterflyFour, "translationY", -700f).apply {
+                duration = 15000
+                start()
+            }
+            delay(200)
+            corButFour?.cancel()
+        }
+    }
+    private fun butterflies(){
+        coroutineScope.launch{
+            while(true){
+                butterflyOne()
+                delay(11000)
+                binding.ivButterflyOne.visibility = View.GONE
+                binding.ivButterflyOne.translationX = 0f
+                binding.ivButterflyOne.translationY = 0f
+                butterflyThree()
+                delay(20000)
+                binding.ivButterflyThree.visibility = View.GONE
+                binding.ivButterflyThree.translationX = 0f
+                binding.ivButterflyThree.translationY = 0f
+                butterflyTwo()
+                delay(25000)
+                binding.ivButterflyTwo.visibility = View.GONE
+                binding.ivButterflyTwo.translationX = 0f
+                binding.ivButterflyTwo.translationY = 0f
+                butterflyFour()
+                delay(30000)
+                binding.ivButterflyFour.visibility = View.GONE
+                binding.ivButterflyFour.translationX = 0f
+                binding.ivButterflyFour.translationY = 0f
+                butterflyThree()
+                delay(15000)
+                binding.ivButterflyThree.visibility = View.GONE
+                binding.ivButterflyThree.translationX = 0f
+                binding.ivButterflyThree.translationY = 0f
+                butterflyOne()
+                delay(37000)
+                binding.ivButterflyOne.visibility = View.GONE
+                binding.ivButterflyOne.translationX = 0f
+                binding.ivButterflyOne.translationY = 0f
+                butterflyTwo()
+                delay(12000)
+                binding.ivButterflyTwo.visibility = View.GONE
+                binding.ivButterflyTwo.translationX = 0f
+                binding.ivButterflyTwo.translationY = 0f
+                butterflyFour()
+                delay(20000)
+                binding.ivButterflyFour.visibility = View.GONE
+                binding.ivButterflyFour.translationX = 0f
+                binding.ivButterflyFour.translationY = 0f
+            }
+        }
+    }
+
     @SuppressLint("Recycle")
     private fun eggToLeft(){
         currentRotation = binding.ivEggRightDown.rotation
@@ -860,6 +1793,144 @@ class WolfActivity : AppCompatActivity() {
         currentTranslationX = binding.ivEggLeftUp.translationX
         currentTranslationY = binding.ivEggLeftUp.translationY
     }
+    @SuppressLint("Recycle")
+    private fun eggToLeftTwo(){
+        currentRotation = binding.ivEggRightDownTwo.rotation
+        currentTranslationX = binding.ivEggRightDownTwo.translationX
+        val translationXAnimator = ObjectAnimator.ofFloat(binding.ivEggRightDownTwo, "translationX", currentTranslationX, (currentTranslationX - 25f))
+        translationXAnimator.duration = speed.toLong()
+        translationXAnimator.start()
+
+        val rotationAnimator = ObjectAnimator.ofFloat(binding.ivEggRightDownTwo, "rotation", currentRotation, (currentRotation - 90f))
+        rotationAnimator.duration = speed.toLong()
+        rotationAnimator.start()
+
+        currentRotation = binding.ivEggRightDownTwo.rotation
+        currentTranslationX = binding.ivEggRightDownTwo.translationX
+    }
+    private fun eggToLeftUpsTwo(){
+        currentRotation = binding.ivEggRightUpTwo.rotation
+        currentTranslationX = binding.ivEggRightUpTwo.translationX
+        val translationXAnimator = ObjectAnimator.ofFloat(binding.ivEggRightUpTwo, "translationX", currentTranslationX, (currentTranslationX - 25f))
+        translationXAnimator.duration = speed.toLong()
+        translationXAnimator.start()
+
+        val rotationAnimator = ObjectAnimator.ofFloat(binding.ivEggRightUpTwo, "rotation", currentRotation, (currentRotation - 90f))
+        rotationAnimator.duration = speed.toLong()
+        rotationAnimator.start()
+
+        currentRotation = binding.ivEggRightUpTwo.rotation
+        currentTranslationX = binding.ivEggRightUpTwo.translationX
+    }
+    @SuppressLint("Recycle")
+    private fun eggToRightTwo(){
+        currentRotation = binding.ivEggLeftDownTwo.rotation
+        currentTranslationX = binding.ivEggLeftDownTwo.translationX
+        val translationXAnimator = ObjectAnimator.ofFloat(binding.ivEggLeftDownTwo, "translationX", currentTranslationX, (currentTranslationX + 25f))
+        translationXAnimator.duration = speed.toLong()
+        translationXAnimator.start()
+
+        val rotationAnimator = ObjectAnimator.ofFloat(binding.ivEggLeftDownTwo, "rotation", currentRotation, (currentRotation + 90f))
+        rotationAnimator.duration = speed.toLong()
+        rotationAnimator.start()
+
+        currentRotation = binding.ivEggLeftDownTwo.rotation
+        currentTranslationX = binding.ivEggLeftDownTwo.translationX
+    }
+    private fun eggToRightUpsTwo(){
+        currentRotation = binding.ivEggLeftUpTwo.rotation
+        currentTranslationX = binding.ivEggLeftUpTwo.translationX
+        val translationXAnimator = ObjectAnimator.ofFloat(binding.ivEggLeftUpTwo, "translationX", currentTranslationX, (currentTranslationX + 25f))
+        translationXAnimator.duration = speed.toLong()
+        translationXAnimator.start()
+
+        val rotationAnimator = ObjectAnimator.ofFloat(binding.ivEggLeftUpTwo, "rotation", currentRotation, (currentRotation + 90f))
+        rotationAnimator.duration = speed.toLong()
+        rotationAnimator.start()
+
+        currentRotation = binding.ivEggLeftUpTwo.rotation
+        currentTranslationX = binding.ivEggLeftUpTwo.translationX
+    }
+    private fun eggToLeftDownTwo(){
+        currentRotation = binding.ivEggRightDownTwo.rotation
+        currentTranslationX = binding.ivEggRightDownTwo.translationX
+        currentTranslationY = binding.ivEggRightDownTwo.translationY
+        ObjectAnimator.ofFloat(binding.ivEggRightDownTwo, "translationX", currentTranslationX, (currentTranslationX - 25f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggRightDownTwo, "translationY", currentTranslationY, (currentTranslationY + 15f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggRightDownTwo, "rotation", currentRotation, (currentRotation - 90f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        currentRotation = binding.ivEggRightDownTwo.rotation
+        currentTranslationX = binding.ivEggRightDownTwo.translationX
+        currentTranslationY = binding.ivEggRightDownTwo.translationY
+    }
+    private fun eggToLeftUpTwo(){
+        currentRotation = binding.ivEggRightUpTwo.rotation
+        currentTranslationX = binding.ivEggRightUpTwo.translationX
+        currentTranslationY = binding.ivEggRightUpTwo.translationY
+        ObjectAnimator.ofFloat(binding.ivEggRightUpTwo, "translationX", currentTranslationX, (currentTranslationX - 25f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggRightUpTwo, "translationY", currentTranslationY, (currentTranslationY + 15f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggRightUpTwo, "rotation", currentRotation, (currentRotation - 90f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        currentRotation = binding.ivEggRightUpTwo.rotation
+        currentTranslationX = binding.ivEggRightUpTwo.translationX
+        currentTranslationY = binding.ivEggRightUpTwo.translationY
+    }
+    private fun eggToRightDownTwo(){
+        currentRotation = binding.ivEggLeftDownTwo.rotation
+        currentTranslationX = binding.ivEggLeftDownTwo.translationX
+        currentTranslationY = binding.ivEggLeftDownTwo.translationY
+        ObjectAnimator.ofFloat(binding.ivEggLeftDownTwo, "translationX", currentTranslationX, (currentTranslationX + 25f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggLeftDownTwo, "translationY", currentTranslationY, (currentTranslationY + 15f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggLeftDownTwo, "rotation", currentRotation, (currentRotation + 90f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        currentRotation = binding.ivEggLeftDownTwo.rotation
+        currentTranslationX = binding.ivEggLeftDownTwo.translationX
+        currentTranslationY = binding.ivEggLeftDownTwo.translationY
+    }
+    private fun eggToRightUpTwo(){
+        currentRotation = binding.ivEggLeftUpTwo.rotation
+        currentTranslationX = binding.ivEggLeftUpTwo.translationX
+        currentTranslationY = binding.ivEggLeftUpTwo.translationY
+        ObjectAnimator.ofFloat(binding.ivEggLeftUpTwo, "translationX", currentTranslationX, (currentTranslationX + 25f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggLeftUpTwo, "translationY", currentTranslationY, (currentTranslationY + 15f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggLeftUpTwo, "rotation", currentRotation, (currentRotation + 90f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        currentRotation = binding.ivEggLeftUpTwo.rotation
+        currentTranslationX = binding.ivEggLeftUpTwo.translationX
+        currentTranslationY = binding.ivEggLeftUpTwo.translationY
+    }
     private fun eggToLeftDownSmashUp(){
         currentRotation = binding.ivEggRightDown.rotation
         currentTranslationX = binding.ivEggRightDown.translationX
@@ -940,6 +2011,86 @@ class WolfActivity : AppCompatActivity() {
         currentTranslationX = binding.ivEggLeftUp.translationX
         currentTranslationY = binding.ivEggLeftUp.translationY
     }
+    private fun eggToLeftDownSmashUpTwo(){
+        currentRotation = binding.ivEggRightDownTwo.rotation
+        currentTranslationX = binding.ivEggRightDownTwo.translationX
+        currentTranslationY = binding.ivEggRightDownTwo.translationY
+        ObjectAnimator.ofFloat(binding.ivEggRightDownTwo, "translationX", currentTranslationX, (currentTranslationX - 25f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggRightDownTwo, "translationY", currentTranslationY, (currentTranslationY + 100f)).apply{
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggRightDownTwo, "rotation", currentRotation, (currentRotation - 90f)).apply{
+            duration = speed.toLong()
+            start()
+        }
+        currentRotation = binding.ivEggRightDownTwo.rotation
+        currentTranslationX = binding.ivEggRightDownTwo.translationX
+        currentTranslationY = binding.ivEggRightDownTwo.translationY
+    }
+    private fun eggToLeftUpSmashUpTwo(){
+        currentRotation = binding.ivEggRightUpTwo.rotation
+        currentTranslationX = binding.ivEggRightUpTwo.translationX
+        currentTranslationY = binding.ivEggRightUpTwo.translationY
+        ObjectAnimator.ofFloat(binding.ivEggRightUpTwo, "translationX", currentTranslationX, (currentTranslationX - 25f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggRightUpTwo, "translationY", currentTranslationY, (currentTranslationY + 100f)).apply{
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggRightUpTwo, "rotation", currentRotation, (currentRotation - 90f)).apply{
+            duration = speed.toLong()
+            start()
+        }
+        currentRotation = binding.ivEggRightUpTwo.rotation
+        currentTranslationX = binding.ivEggRightUpTwo.translationX
+        currentTranslationY = binding.ivEggRightUpTwo.translationY
+    }
+    private fun eggToRightDownSmashUpTwo() {
+        currentRotation = binding.ivEggLeftDownTwo.rotation
+        currentTranslationX = binding.ivEggLeftDownTwo.translationX
+        currentTranslationY = binding.ivEggLeftDownTwo.translationY
+        ObjectAnimator.ofFloat(binding.ivEggLeftDownTwo, "translationX", currentTranslationX, (currentTranslationX + 25f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggLeftDownTwo, "translationY", currentTranslationY, (currentTranslationY + 100f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggLeftDownTwo, "rotation", currentRotation, (currentRotation + 90f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        currentRotation = binding.ivEggLeftDownTwo.rotation
+        currentTranslationX = binding.ivEggLeftDownTwo.translationX
+        currentTranslationY = binding.ivEggLeftDownTwo.translationY
+    }
+    private fun eggToRightUpSmashUpTwo(){
+        currentRotation = binding.ivEggLeftUpTwo.rotation
+        currentTranslationX = binding.ivEggLeftUpTwo.translationX
+        currentTranslationY = binding.ivEggLeftUpTwo.translationY
+        ObjectAnimator.ofFloat(binding.ivEggLeftUpTwo, "translationX", currentTranslationX, (currentTranslationX + 25f)).apply {
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggLeftUpTwo, "translationY", currentTranslationY, (currentTranslationY + 100f)).apply{
+            duration = speed.toLong()
+            start()
+        }
+        ObjectAnimator.ofFloat(binding.ivEggLeftUpTwo, "rotation", currentRotation, (currentRotation + 90f)).apply{
+            duration = speed.toLong()
+            start()
+        }
+        currentRotation = binding.ivEggLeftUpTwo.rotation
+        currentTranslationX = binding.ivEggLeftUpTwo.translationX
+        currentTranslationY = binding.ivEggLeftUpTwo.translationY
+    }
     @SuppressLint("SetTextI18n")
     private fun rightDownCollision(){
         val rect1 = Rect()
@@ -949,79 +2100,79 @@ class WolfActivity : AppCompatActivity() {
         val collision = rect1.intersect(rect2)
         if (collision) {
             count++
-            if(count in 51..100 && count % 50 == 0){
+            if(count in 51..100 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 2"
             }
-            if(count in 101..150 && count % 50 == 0){
+            if(count in 101..150 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 3"
             }
-            if(count in 151..200 && count % 50 == 0){
+            if(count in 151..200 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 4"
             }
-            if(count in 201..250 && count % 50 == 0){
+            if(count in 201..250 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 5"
             }
-            if(count in 251..300 && count % 50 == 0){
+            if(count in 251..300 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 6"
             }
-            if(count in 301..350 && count % 50 == 0){
+            if(count in 301..350 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 7"
             }
-            if(count in 351..400 && count % 50 == 0){
+            if(count in 351..400 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 8"
             }
-            if(count in 401..450 && count % 50 == 0){
+            if(count in 401..450 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 9"
             }
-            if(count in 451..500 && count % 50 == 0){
+            if(count in 451..500 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 10"
             }
-            if(count in 501..550 && count % 50 == 0){
+            if(count in 501..550 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 11"
             }
-            if(count in 551..600 && count % 50 == 0){
+            if(count in 551..600 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 12"
             }
-            if(count in 601..650 && count % 50 == 0){
+            if(count in 601..650 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 13"
             }
-            if(count in 651..700 && count % 50 == 0){
+            if(count in 651..700 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 14"
             }
-            if(count in 701..750 && count % 50 == 0){
+            if(count in 701..750 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 15"
             }
-            if(count in 751..800 && count % 50 == 0){
+            if(count in 751..800 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 16"
             }
-            if(count in 801..850 && count % 50 == 0){
+            if(count in 801..850 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 17"
             }
-            if(count in 851..900 && count % 50 == 0){
+            if(count in 851..900 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 18"
             }
-            if(count in 901..950 && count % 50 == 0){
+            if(count in 901..950 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 19"
             }
-            if(count in 951..1000 && count % 50 == 0){
+            if(count in 951..1000 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 20"
             }
@@ -1041,79 +2192,79 @@ class WolfActivity : AppCompatActivity() {
         val collision = rect1.intersect(rect2)
         if (collision) {
             count++
-            if(count in 51..100 && count % 50 == 0){
+            if(count in 51..100 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 2"
             }
-            if(count in 101..150 && count % 50 == 0){
+            if(count in 101..150 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 3"
             }
-            if(count in 151..200 && count % 50 == 0){
+            if(count in 151..200 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 4"
             }
-            if(count in 201..250 && count % 50 == 0){
+            if(count in 201..250 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 5"
             }
-            if(count in 251..300 && count % 50 == 0){
+            if(count in 251..300 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 6"
             }
-            if(count in 301..350 && count % 50 == 0){
+            if(count in 301..350 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 7"
             }
-            if(count in 351..400 && count % 50 == 0){
+            if(count in 351..400 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 8"
             }
-            if(count in 401..450 && count % 50 == 0){
+            if(count in 401..450 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 9"
             }
-            if(count in 451..500 && count % 50 == 0){
+            if(count in 451..500 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 10"
             }
-            if(count in 501..550 && count % 50 == 0){
+            if(count in 501..550 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 11"
             }
-            if(count in 551..600 && count % 50 == 0){
+            if(count in 551..600 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 12"
             }
-            if(count in 601..650 && count % 50 == 0){
+            if(count in 601..650 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 13"
             }
-            if(count in 651..700 && count % 50 == 0){
+            if(count in 651..700 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 14"
             }
-            if(count in 701..750 && count % 50 == 0){
+            if(count in 701..750 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 15"
             }
-            if(count in 751..800 && count % 50 == 0){
+            if(count in 751..800 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 16"
             }
-            if(count in 801..850 && count % 50 == 0){
+            if(count in 801..850 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 17"
             }
-            if(count in 851..900 && count % 50 == 0){
+            if(count in 851..900 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 18"
             }
-            if(count in 901..950 && count % 50 == 0){
+            if(count in 901..950 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 19"
             }
-            if(count in 951..1000 && count % 50 == 0){
+            if(count in 951..1000 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 20"
             }
@@ -1133,79 +2284,79 @@ class WolfActivity : AppCompatActivity() {
         val collision = rect1.intersect(rect2)
         if (collision) {
             count++
-            if(count in 51..100 && count % 50 == 0){
+            if(count in 51..100 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 2"
             }
-            if(count in 101..150 && count % 50 == 0){
+            if(count in 101..150 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 3"
             }
-            if(count in 151..200 && count % 50 == 0){
+            if(count in 151..200 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 4"
             }
-            if(count in 201..250 && count % 50 == 0){
+            if(count in 201..250 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 5"
             }
-            if(count in 251..300 && count % 50 == 0){
+            if(count in 251..300 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 6"
             }
-            if(count in 301..350 && count % 50 == 0){
+            if(count in 301..350 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 7"
             }
-            if(count in 351..400 && count % 50 == 0){
+            if(count in 351..400 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 8"
             }
-            if(count in 401..450 && count % 50 == 0){
+            if(count in 401..450 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 9"
             }
-            if(count in 451..500 && count % 50 == 0){
+            if(count in 451..500 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 10"
             }
-            if(count in 501..550 && count % 50 == 0){
+            if(count in 501..550 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 11"
             }
-            if(count in 551..600 && count % 50 == 0){
+            if(count in 551..600 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 12"
             }
-            if(count in 601..650 && count % 50 == 0){
+            if(count in 601..650 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 13"
             }
-            if(count in 651..700 && count % 50 == 0){
+            if(count in 651..700 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 14"
             }
-            if(count in 701..750 && count % 50 == 0){
+            if(count in 701..750 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 15"
             }
-            if(count in 751..800 && count % 50 == 0){
+            if(count in 751..800 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 16"
             }
-            if(count in 801..850 && count % 50 == 0){
+            if(count in 801..850 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 17"
             }
-            if(count in 851..900 && count % 50 == 0){
+            if(count in 851..900 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 18"
             }
-            if(count in 901..950 && count % 50 == 0){
+            if(count in 901..950 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 19"
             }
-            if(count in 951..1000 && count % 50 == 0){
+            if(count in 951..1000 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 20"
             }
@@ -1225,79 +2376,79 @@ class WolfActivity : AppCompatActivity() {
         val collision = rect1.intersect(rect2)
         if (collision) {
             count++
-            if(count in 51..100 && count % 50 == 0){
+            if(count in 51..100 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 2"
             }
-            if(count in 101..150 && count % 50 == 0){
+            if(count in 101..150 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 3"
             }
-            if(count in 151..200 && count % 50 == 0){
+            if(count in 151..200 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 4"
             }
-            if(count in 201..250 && count % 50 == 0){
+            if(count in 201..250 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 5"
             }
-            if(count in 251..300 && count % 50 == 0){
+            if(count in 251..300 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 6"
             }
-            if(count in 301..350 && count % 50 == 0){
+            if(count in 301..350 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 7"
             }
-            if(count in 351..400 && count % 50 == 0){
+            if(count in 351..400 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 8"
             }
-            if(count in 401..450 && count % 50 == 0){
+            if(count in 401..450 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 9"
             }
-            if(count in 451..500 && count % 50 == 0){
+            if(count in 451..500 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 10"
             }
-            if(count in 501..550 && count % 50 == 0){
+            if(count in 501..550 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 11"
             }
-            if(count in 551..600 && count % 50 == 0){
+            if(count in 551..600 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 12"
             }
-            if(count in 601..650 && count % 50 == 0){
+            if(count in 601..650 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 13"
             }
-            if(count in 651..700 && count % 50 == 0){
+            if(count in 651..700 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 14"
             }
-            if(count in 701..750 && count % 50 == 0){
+            if(count in 701..750 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 15"
             }
-            if(count in 751..800 && count % 50 == 0){
+            if(count in 751..800 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 16"
             }
-            if(count in 801..850 && count % 50 == 0){
+            if(count in 801..850 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 17"
             }
-            if(count in 851..900 && count % 50 == 0){
+            if(count in 851..900 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 18"
             }
-            if(count in 901..950 && count % 50 == 0){
+            if(count in 901..950 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 19"
             }
-            if(count in 951..1000 && count % 50 == 0){
+            if(count in 951..1000 && (count-1) % 50 == 0){
                 speed -= 10
                 binding.tvSpeed.text = "Speed : 20"
             }
@@ -1306,6 +2457,376 @@ class WolfActivity : AppCompatActivity() {
             binding.ivSmashEggLeft.visibility = View.GONE
             binding.ivEggLeftUp.translationX = 0f
             binding.ivEggLeftUp.translationY = 0f
+
+        }
+    }
+    @SuppressLint("SetTextI18n")
+    private fun rightDownCollisionTwo(){
+        val rect1 = Rect()
+        binding.ivEggRightDownTwo.getHitRect(rect1)
+        val rect2 = Rect()
+        binding.ivWolfRightDown.getHitRect(rect2)
+        val collision = rect1.intersect(rect2)
+        if (collision) {
+            count++
+            if(count in 51..100 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 2"
+            }
+            if(count in 101..150 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 3"
+            }
+            if(count in 151..200 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 4"
+            }
+            if(count in 201..250 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 5"
+            }
+            if(count in 251..300 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 6"
+            }
+            if(count in 301..350 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 7"
+            }
+            if(count in 351..400 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 8"
+            }
+            if(count in 401..450 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 9"
+            }
+            if(count in 451..500 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 10"
+            }
+            if(count in 501..550 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 11"
+            }
+            if(count in 551..600 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 12"
+            }
+            if(count in 601..650 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 13"
+            }
+            if(count in 651..700 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 14"
+            }
+            if(count in 701..750 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 15"
+            }
+            if(count in 751..800 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 16"
+            }
+            if(count in 801..850 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 17"
+            }
+            if(count in 851..900 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 18"
+            }
+            if(count in 901..950 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 19"
+            }
+            if(count in 951..1000 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 20"
+            }
+            binding.tvCount.text = count.toString()
+            binding.ivEggRightDownTwo.visibility = View.GONE
+            binding.ivSmashEggRight.visibility = View.GONE
+            binding.ivEggRightDownTwo.translationX = 0f
+            binding.ivEggRightDownTwo.translationY = 0f
+        }
+    }
+    @SuppressLint("SetTextI18n")
+    private fun rightUpCollisionTwo(){
+        val rect1 = Rect()
+        binding.ivEggRightUpTwo.getHitRect(rect1)
+        val rect2 = Rect()
+        binding.ivWolfRightUp.getHitRect(rect2)
+        val collision = rect1.intersect(rect2)
+        if (collision) {
+            count++
+            if(count in 51..100 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 2"
+            }
+            if(count in 101..150 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 3"
+            }
+            if(count in 151..200 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 4"
+            }
+            if(count in 201..250 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 5"
+            }
+            if(count in 251..300 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 6"
+            }
+            if(count in 301..350 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 7"
+            }
+            if(count in 351..400 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 8"
+            }
+            if(count in 401..450 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 9"
+            }
+            if(count in 451..500 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 10"
+            }
+            if(count in 501..550 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 11"
+            }
+            if(count in 551..600 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 12"
+            }
+            if(count in 601..650 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 13"
+            }
+            if(count in 651..700 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 14"
+            }
+            if(count in 701..750 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 15"
+            }
+            if(count in 751..800 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 16"
+            }
+            if(count in 801..850 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 17"
+            }
+            if(count in 851..900 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 18"
+            }
+            if(count in 901..950 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 19"
+            }
+            if(count in 951..1000 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 20"
+            }
+            binding.tvCount.text = count.toString()
+            binding.ivEggRightUpTwo.visibility = View.GONE
+            binding.ivSmashEggRight.visibility = View.GONE
+            binding.ivEggRightUpTwo.translationX = 0f
+            binding.ivEggRightUpTwo.translationY = 0f
+        }
+    }
+    @SuppressLint("SetTextI18n")
+    private fun leftDownCollisionTwo(){
+        val rect1 = Rect()
+        binding.ivEggLeftDownTwo.getHitRect(rect1)
+        val rect2 = Rect()
+        binding.ivWolfLeftDown.getHitRect(rect2)
+        val collision = rect1.intersect(rect2)
+        if (collision) {
+            count++
+            if(count in 51..100 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 2"
+            }
+            if(count in 101..150 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 3"
+            }
+            if(count in 151..200 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 4"
+            }
+            if(count in 201..250 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 5"
+            }
+            if(count in 251..300 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 6"
+            }
+            if(count in 301..350 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 7"
+            }
+            if(count in 351..400 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 8"
+            }
+            if(count in 401..450 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 9"
+            }
+            if(count in 451..500 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 10"
+            }
+            if(count in 501..550 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 11"
+            }
+            if(count in 551..600 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 12"
+            }
+            if(count in 601..650 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 13"
+            }
+            if(count in 651..700 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 14"
+            }
+            if(count in 701..750 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 15"
+            }
+            if(count in 751..800 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 16"
+            }
+            if(count in 801..850 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 17"
+            }
+            if(count in 851..900 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 18"
+            }
+            if(count in 901..950 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 19"
+            }
+            if(count in 951..1000 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 20"
+            }
+            binding.tvCount.text = count.toString()
+            binding.ivEggLeftDownTwo.visibility = View.GONE
+            binding.ivSmashEggLeft.visibility = View.GONE
+            binding.ivEggLeftDownTwo.translationX = 0f
+            binding.ivEggLeftDownTwo.translationY = 0f
+        }
+    }
+    @SuppressLint("SetTextI18n")
+    private fun leftUpCollisionTwo(){
+        val rect1 = Rect()
+        binding.ivEggLeftUpTwo.getHitRect(rect1)
+        val rect2 = Rect()
+        binding.ivWolfLeftUp.getHitRect(rect2)
+        val collision = rect1.intersect(rect2)
+        if (collision) {
+            count++
+            if(count in 51..100 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 2"
+            }
+            if(count in 101..150 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 3"
+            }
+            if(count in 151..200 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 4"
+            }
+            if(count in 201..250 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 5"
+            }
+            if(count in 251..300 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 6"
+            }
+            if(count in 301..350 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 7"
+            }
+            if(count in 351..400 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 8"
+            }
+            if(count in 401..450 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 9"
+            }
+            if(count in 451..500 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 10"
+            }
+            if(count in 501..550 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 11"
+            }
+            if(count in 551..600 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 12"
+            }
+            if(count in 601..650 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 13"
+            }
+            if(count in 651..700 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 14"
+            }
+            if(count in 701..750 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 15"
+            }
+            if(count in 751..800 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 16"
+            }
+            if(count in 801..850 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 17"
+            }
+            if(count in 851..900 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 18"
+            }
+            if(count in 901..950 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 19"
+            }
+            if(count in 951..1000 && (count-1) % 50 == 0){
+                speed -= 10
+                binding.tvSpeed.text = "Speed : 20"
+            }
+            binding.tvCount.text = count.toString()
+            binding.ivEggLeftUpTwo.visibility = View.GONE
+            binding.ivSmashEggLeft.visibility = View.GONE
+            binding.ivEggLeftUpTwo.translationX = 0f
+            binding.ivEggLeftUpTwo.translationY = 0f
+
         }
     }
     private fun hideSystemUI () {
