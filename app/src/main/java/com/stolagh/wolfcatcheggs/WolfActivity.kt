@@ -15,6 +15,7 @@ import android.view.animation.AnimationUtils
 import android.view.animation.RotateAnimation
 import android.view.animation.ScaleAnimation
 import android.view.animation.TranslateAnimation
+import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -28,12 +29,14 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.properties.Delegates
 
 class WolfActivity : AppCompatActivity() {
     private lateinit var binding : ActivityWolfBinding
     private var coroutineScope = CoroutineScope(Dispatchers.Main + Job())
     private var coroutine : Job? = null
     private var coroutine2 : Job? = null
+    private var coroutineButterfly : Job? = null
     private var corButOne : Job? = null
     private var corButTwo : Job? = null
     private var corButThree : Job? = null
@@ -55,13 +58,14 @@ class WolfActivity : AppCompatActivity() {
     private var press2 = true
     private var pressListTracks = false
     private var pressMusic = false
+    private var pressSpeed = false
     private var currentRotation = 0f
     private var currentTranslationX = 0f
     private var currentTranslationY = 0f
     private var count = 0
     private var bestA = 0
     private var bestB = 0
-    private var speed = 300
+    private var speed = 0
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var musicPlay: MediaPlayer
     private var lastFunction: (() -> Unit)? = null
@@ -83,6 +87,7 @@ class WolfActivity : AppCompatActivity() {
         setContentView(binding.root)
         hideSystemUI()
         butterflies()
+        seekbar()
         Glide.with(this).asGif().load(R.drawable.butbroun).into(binding.ivButterflyOne)
         Glide.with(this).asGif().load(R.drawable.butgreen).into(binding.ivButterflyTwo)
         Glide.with(this).asGif().load(R.drawable.butrose).into(binding.ivButterflyThree)
@@ -102,6 +107,34 @@ class WolfActivity : AppCompatActivity() {
             binding.tvBestRecordB.text = "Game B : $bestB"
         } else {
             binding.tvBestRecordB.text = "Game B : $bestB"
+        }
+        binding.tvSpeedMinus.setOnClickListener {
+            binding.seekBar.progress = binding.seekBar.progress - 1
+            binding.tvSpeedSeekLabel.text = "${binding.seekBar.progress}"
+        }
+        binding.tvSpeedPlus.setOnClickListener {
+            binding.seekBar.progress = binding.seekBar.progress + 1
+            binding.tvSpeedSeekLabel.text = "${binding.seekBar.progress}"
+        }
+        binding.tvSpeedOk.setOnClickListener {
+            binding.cvSpeed.setCardBackgroundColor(ContextCompat.getColor(this@WolfActivity, R.color.yellowlight))
+            binding.cvSeekSpeed.visibility = View.GONE
+            seekspeed()
+            showSpeedBack()
+            pressSpeed = false
+        }
+        binding.cvSpeed.setOnClickListener {
+            if(!pressSpeed){
+                binding.cvSpeed.setCardBackgroundColor(ContextCompat.getColor(this@WolfActivity, R.color.white))
+                binding.cvSeekSpeed.visibility = View.VISIBLE
+                showSpeed()
+                pressSpeed = true
+            } else {
+                binding.cvSpeed.setCardBackgroundColor(ContextCompat.getColor(this@WolfActivity, R.color.yellowlight))
+                binding.cvSeekSpeed.visibility = View.GONE
+                showSpeedBack()
+                pressSpeed = false
+            }
         }
         binding.cvMusic.setOnClickListener {
                 if (!pressMusic) {
@@ -157,8 +190,11 @@ class WolfActivity : AppCompatActivity() {
         }
         binding.btGameA.setOnClickListener {
             binding.ivPlayA.visibility = View.VISIBLE
+            binding.ivPlayA.setImageResource(R.drawable.baseline_play_arrow_24)
             binding.ivPlayB.visibility = View.GONE
             binding.tvPlay.visibility = View.VISIBLE
+            binding.tvPlay.text = "PLAY"
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
             binding.btGameA.setBackgroundColor(ContextCompat.getColor(this, R.color.white))
             binding.btGameB.setBackgroundColor(ContextCompat.getColor(this, R.color.yellowlight))
             binding.ivEggRightDown.visibility = View.GONE
@@ -169,11 +205,87 @@ class WolfActivity : AppCompatActivity() {
             binding.ivEggLeftUp.visibility = View.GONE
             binding.ivEggLeftDownTwo.visibility = View.GONE
             binding.ivEggLeftUpTwo.visibility = View.GONE
+            count = 0
+            if(binding.tvSpeedSeekLabel.text == "1"){
+                speed = 300
+            }
+            if(binding.tvSpeedSeekLabel.text == "2"){
+                speed = 290
+            }
+            if(binding.tvSpeedSeekLabel.text == "3"){
+                speed = 280
+            }
+            if(binding.tvSpeedSeekLabel.text == "4"){
+                speed = 270
+            }
+            if(binding.tvSpeedSeekLabel.text == "5"){
+                speed = 260
+            }
+            if(binding.tvSpeedSeekLabel.text == "6"){
+                speed = 250
+            }
+            if(binding.tvSpeedSeekLabel.text == "7"){
+                speed = 240
+            }
+            if(binding.tvSpeedSeekLabel.text == "8"){
+                speed = 230
+            }
+            if(binding.tvSpeedSeekLabel.text == "9"){
+                speed = 220
+            }
+            if(binding.tvSpeedSeekLabel.text == "10"){
+                speed = 210
+            }
+            if(binding.tvSpeedSeekLabel.text == "11"){
+                speed = 200
+            }
+            if(binding.tvSpeedSeekLabel.text == "12"){
+                speed = 190
+            }
+            if(binding.tvSpeedSeekLabel.text == "13"){
+                speed = 180
+            }
+            if(binding.tvSpeedSeekLabel.text == "14"){
+                speed = 170
+            }
+            if(binding.tvSpeedSeekLabel.text == "15"){
+                speed = 160
+            }
+            if(binding.tvSpeedSeekLabel.text == "16"){
+                speed = 150
+            }
+            if(binding.tvSpeedSeekLabel.text == "17"){
+                speed = 140
+            }
+            if(binding.tvSpeedSeekLabel.text == "18"){
+                speed = 130
+            }
+            if(binding.tvSpeedSeekLabel.text == "19"){
+                speed = 120
+            }
+            if(binding.tvSpeedSeekLabel.text == "20"){
+                speed = 110
+            }
+            press = true
+            press2 = true
+            coroutineRightUpFall?.cancel()
+            coroutineRightDownFall?.cancel()
+            coroutineLeftUpFall?.cancel()
+            coroutineLeftDownFall?.cancel()
+            coroutineRightUpFallTwo?.cancel()
+            coroutineRightDownFallTwo?.cancel()
+            coroutineLeftUpFallTwo?.cancel()
+            coroutineLeftDownFallTwo?.cancel()
+            coroutine?.cancel()
+            coroutine2?.cancel()
         }
         binding.btGameB.setOnClickListener {
             binding.ivPlayB.visibility = View.VISIBLE
+            binding.ivPlayB.setImageResource(R.drawable.baseline_play_arrow_24)
             binding.ivPlayA.visibility = View.GONE
             binding.tvPlay.visibility = View.VISIBLE
+            binding.tvPlay.text = "PLAY"
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
             binding.btGameB.setBackgroundColor(ContextCompat.getColor(this, R.color.white))
             binding.btGameA.setBackgroundColor(ContextCompat.getColor(this, R.color.yellowlight))
             binding.ivEggRightDown.visibility = View.GONE
@@ -184,6 +296,79 @@ class WolfActivity : AppCompatActivity() {
             binding.ivEggLeftUp.visibility = View.GONE
             binding.ivEggLeftDownTwo.visibility = View.GONE
             binding.ivEggLeftUpTwo.visibility = View.GONE
+            count = 0
+            if(binding.tvSpeedSeekLabel.text == "1"){
+                speed = 300
+            }
+            if(binding.tvSpeedSeekLabel.text == "2"){
+                speed = 290
+            }
+            if(binding.tvSpeedSeekLabel.text == "3"){
+                speed = 280
+            }
+            if(binding.tvSpeedSeekLabel.text == "4"){
+                speed = 270
+            }
+            if(binding.tvSpeedSeekLabel.text == "5"){
+                speed = 260
+            }
+            if(binding.tvSpeedSeekLabel.text == "6"){
+                speed = 250
+            }
+            if(binding.tvSpeedSeekLabel.text == "7"){
+                speed = 240
+            }
+            if(binding.tvSpeedSeekLabel.text == "8"){
+                speed = 230
+            }
+            if(binding.tvSpeedSeekLabel.text == "9"){
+                speed = 220
+            }
+            if(binding.tvSpeedSeekLabel.text == "10"){
+                speed = 210
+            }
+            if(binding.tvSpeedSeekLabel.text == "11"){
+                speed = 200
+            }
+            if(binding.tvSpeedSeekLabel.text == "12"){
+                speed = 190
+            }
+            if(binding.tvSpeedSeekLabel.text == "13"){
+                speed = 180
+            }
+            if(binding.tvSpeedSeekLabel.text == "14"){
+                speed = 170
+            }
+            if(binding.tvSpeedSeekLabel.text == "15"){
+                speed = 160
+            }
+            if(binding.tvSpeedSeekLabel.text == "16"){
+                speed = 150
+            }
+            if(binding.tvSpeedSeekLabel.text == "17"){
+                speed = 140
+            }
+            if(binding.tvSpeedSeekLabel.text == "18"){
+                speed = 130
+            }
+            if(binding.tvSpeedSeekLabel.text == "19"){
+                speed = 120
+            }
+            if(binding.tvSpeedSeekLabel.text == "20"){
+                speed = 110
+            }
+            press = true
+            press2 = true
+            coroutineRightUpFall?.cancel()
+            coroutineRightDownFall?.cancel()
+            coroutineLeftUpFall?.cancel()
+            coroutineLeftDownFall?.cancel()
+            coroutineRightUpFallTwo?.cancel()
+            coroutineRightDownFallTwo?.cancel()
+            coroutineLeftUpFallTwo?.cancel()
+            coroutineLeftDownFallTwo?.cancel()
+            coroutine?.cancel()
+            coroutine2?.cancel()
         }
         binding.ivPlayA.setOnClickListener {
             if (press) {
@@ -209,10 +394,70 @@ class WolfActivity : AppCompatActivity() {
                 binding.ivEggLeftUp.translationX = 0f
                 binding.ivEggLeftUp.translationY = 0f
                 count = 0
-                speed = 300
+                if(binding.tvSpeedSeekLabel.text == "1"){
+                    speed = 300
+                }
+                if(binding.tvSpeedSeekLabel.text == "2"){
+                    speed = 290
+                }
+                if(binding.tvSpeedSeekLabel.text == "3"){
+                    speed = 280
+                }
+                if(binding.tvSpeedSeekLabel.text == "4"){
+                    speed = 270
+                }
+                if(binding.tvSpeedSeekLabel.text == "5"){
+                    speed = 260
+                }
+                if(binding.tvSpeedSeekLabel.text == "6"){
+                    speed = 250
+                }
+                if(binding.tvSpeedSeekLabel.text == "7"){
+                    speed = 240
+                }
+                if(binding.tvSpeedSeekLabel.text == "8"){
+                    speed = 230
+                }
+                if(binding.tvSpeedSeekLabel.text == "9"){
+                    speed = 220
+                }
+                if(binding.tvSpeedSeekLabel.text == "10"){
+                    speed = 210
+                }
+                if(binding.tvSpeedSeekLabel.text == "11"){
+                    speed = 200
+                }
+                if(binding.tvSpeedSeekLabel.text == "12"){
+                    speed = 190
+                }
+                if(binding.tvSpeedSeekLabel.text == "13"){
+                    speed = 180
+                }
+                if(binding.tvSpeedSeekLabel.text == "14"){
+                    speed = 170
+                }
+                if(binding.tvSpeedSeekLabel.text == "15"){
+                    speed = 160
+                }
+                if(binding.tvSpeedSeekLabel.text == "16"){
+                    speed = 150
+                }
+                if(binding.tvSpeedSeekLabel.text == "17"){
+                    speed = 140
+                }
+                if(binding.tvSpeedSeekLabel.text == "18"){
+                    speed = 130
+                }
+                if(binding.tvSpeedSeekLabel.text == "19"){
+                    speed = 120
+                }
+                if(binding.tvSpeedSeekLabel.text == "20"){
+                    speed = 110
+                }
                 binding.tvCount.text = count.toString()
                 binding.ivPlayA.setImageResource(R.drawable.baseline_stop_24)
                 binding.tvPlay.text = "stop"
+                binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
                 press = false
                 press2 = true
                 coroutine = coroutineScope.launch {
@@ -407,10 +652,70 @@ class WolfActivity : AppCompatActivity() {
                 binding.ivEggLeftUpTwo.translationX = 0f
                 binding.ivEggLeftUpTwo.translationY = 0f
                 count = 0
-                speed = 300
+                if(binding.tvSpeedSeekLabel.text == "1"){
+                    speed = 300
+                }
+                if(binding.tvSpeedSeekLabel.text == "2"){
+                    speed = 290
+                }
+                if(binding.tvSpeedSeekLabel.text == "3"){
+                    speed = 280
+                }
+                if(binding.tvSpeedSeekLabel.text == "4"){
+                    speed = 270
+                }
+                if(binding.tvSpeedSeekLabel.text == "5"){
+                    speed = 260
+                }
+                if(binding.tvSpeedSeekLabel.text == "6"){
+                    speed = 250
+                }
+                if(binding.tvSpeedSeekLabel.text == "7"){
+                    speed = 240
+                }
+                if(binding.tvSpeedSeekLabel.text == "8"){
+                    speed = 230
+                }
+                if(binding.tvSpeedSeekLabel.text == "9"){
+                    speed = 220
+                }
+                if(binding.tvSpeedSeekLabel.text == "10"){
+                    speed = 210
+                }
+                if(binding.tvSpeedSeekLabel.text == "11"){
+                    speed = 200
+                }
+                if(binding.tvSpeedSeekLabel.text == "12"){
+                    speed = 190
+                }
+                if(binding.tvSpeedSeekLabel.text == "13"){
+                    speed = 180
+                }
+                if(binding.tvSpeedSeekLabel.text == "14"){
+                    speed = 170
+                }
+                if(binding.tvSpeedSeekLabel.text == "15"){
+                    speed = 160
+                }
+                if(binding.tvSpeedSeekLabel.text == "16"){
+                    speed = 150
+                }
+                if(binding.tvSpeedSeekLabel.text == "17"){
+                    speed = 140
+                }
+                if(binding.tvSpeedSeekLabel.text == "18"){
+                    speed = 130
+                }
+                if(binding.tvSpeedSeekLabel.text == "19"){
+                    speed = 120
+                }
+                if(binding.tvSpeedSeekLabel.text == "20"){
+                    speed = 110
+                }
                 binding.tvCount.text = count.toString()
                 binding.ivPlayB.setImageResource(R.drawable.baseline_stop_24)
                 binding.tvPlay.text = "stop"
+                binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
                 press2 = false
                 coroutine2 = coroutineScope.launch {
                     while (true) {
@@ -808,6 +1113,104 @@ class WolfActivity : AppCompatActivity() {
             pressListTracks = false
         }
     }
+    private fun seekbar(){
+        binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            @SuppressLint("SetTextI18n")
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                binding.tvSpeedSeekLabel.text = "$progress"
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+        })
+    }
+    @SuppressLint("SetTextI18n")
+    private fun seekspeed() : Int {
+        if(binding.tvSpeedSeekLabel.text == "1"){
+            speed = 300
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "2"){
+            speed = 290
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "3"){
+            speed = 280
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "4"){
+            speed = 270
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "5"){
+            speed = 260
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "6"){
+            speed = 250
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "7"){
+            speed = 240
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "8"){
+            speed = 230
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "9"){
+            speed = 220
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "10"){
+            speed = 210
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "11"){
+            speed = 200
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "12"){
+            speed = 190
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "13"){
+            speed = 180
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "14"){
+            speed = 170
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "15"){
+            speed = 160
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "16"){
+            speed = 150
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "17"){
+            speed = 140
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "18"){
+            speed = 130
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "19"){
+            speed = 120
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        if(binding.tvSpeedSeekLabel.text == "20"){
+            speed = 110
+            binding.tvSpeed.text = "Speed : ${binding.seekBar.progress}"
+        }
+        return binding.seekBar.progress
+    }
     @SuppressLint("SetTextI18n")
     private fun coroutineRightDownFall(){
         coroutineRightDownFall?.cancel()
@@ -831,6 +1234,8 @@ class WolfActivity : AppCompatActivity() {
                 eggToLeftDown()
                 delay(speed.toLong())
                 eggToLeftDown()
+            delay(speed.toLong())
+            eggToLeftDown()
             delay(speed.toLong())
             eggToLeftDown()
                 if (binding.ivWolfRightDown.visibility == View.VISIBLE) {
@@ -915,6 +1320,8 @@ class WolfActivity : AppCompatActivity() {
                 eggToRightDown()
                 delay(speed.toLong())
                 eggToRightDown()
+            delay(speed.toLong())
+            eggToRightDown()
             delay(speed.toLong())
             eggToRightDown()
                 if (binding.ivWolfLeftDown.visibility == View.VISIBLE) {
@@ -1171,6 +1578,8 @@ class WolfActivity : AppCompatActivity() {
             eggToLeftDownTwo()
             delay(speed.toLong())
             eggToLeftDownTwo()
+            delay(speed.toLong())
+            eggToLeftDownTwo()
             if (binding.ivWolfRightDown.visibility == View.VISIBLE) {
                 rightDownCollisionTwo()
             } else {
@@ -1232,6 +1641,8 @@ class WolfActivity : AppCompatActivity() {
             eggToRightTwo()
             delay(speed.toLong())
             eggToRightTwo()
+            delay(speed.toLong())
+            eggToRightDownTwo()
             delay(speed.toLong())
             eggToRightDownTwo()
             delay(speed.toLong())
@@ -1460,6 +1871,20 @@ class WolfActivity : AppCompatActivity() {
         animation.duration = 500
         binding.cvTracks.startAnimation(animation)
     }
+    private fun showSpeed(){
+        val animation = ScaleAnimation(1f, 1f, 0f, 1f,
+            Animation.RELATIVE_TO_SELF, 0.5f,
+            Animation.RELATIVE_TO_SELF, 0f)
+        animation.duration = 500
+        binding.cvSeekSpeed.startAnimation(animation)
+    }
+    private fun showSpeedBack(){
+        val animation = ScaleAnimation(1f, 1f, 1f, 0f,
+            Animation.RELATIVE_TO_SELF, 0.5f,
+            Animation.RELATIVE_TO_SELF, 0f)
+        animation.duration = 500
+        binding.cvSeekSpeed.startAnimation(animation)
+    }
     private fun track1() : MediaPlayer {
        return MediaPlayer.create(this, R.raw.montazh)
     }
@@ -1509,9 +1934,8 @@ class WolfActivity : AppCompatActivity() {
         super.onDestroy()
         stopMusic()
         releaseMusicPlay()
+        coroutineButterfly?.cancel()
     }
-
-
     private fun butterflyOne(){
         binding.ivButterflyOne.visibility = View.VISIBLE
         corButOne = coroutineScope.launch {
@@ -1609,7 +2033,7 @@ class WolfActivity : AppCompatActivity() {
         }
     }
     private fun butterflies(){
-        coroutineScope.launch{
+       coroutineButterfly =  coroutineScope.launch{
             while(true){
                 butterflyOne()
                 delay(11000)
@@ -2101,80 +2525,140 @@ class WolfActivity : AppCompatActivity() {
         if (collision) {
             count++
             if(count in 51..100 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 2"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 101..150 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 3"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 151..200 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 4"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 201..250 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 5"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 251..300 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 6"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 301..350 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 7"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 351..400 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 8"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 401..450 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 9"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 451..500 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 10"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 501..550 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 11"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 551..600 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 12"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 601..650 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 13"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 651..700 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 14"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 701..750 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 15"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 751..800 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 16"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 801..850 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 17"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 851..900 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 18"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 901..950 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 19"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 951..1000 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 20"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
+            }
+            if(count > 1000){
+                speed = 110
             }
             binding.tvCount.text = count.toString()
             binding.ivEggRightDown.visibility = View.GONE
@@ -2193,80 +2677,140 @@ class WolfActivity : AppCompatActivity() {
         if (collision) {
             count++
             if(count in 51..100 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 2"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 101..150 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 3"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 151..200 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 4"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 201..250 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 5"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 251..300 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 6"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 301..350 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 7"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 351..400 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 8"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 401..450 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 9"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 451..500 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 10"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 501..550 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 11"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 551..600 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 12"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 601..650 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 13"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 651..700 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 14"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 701..750 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 15"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 751..800 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 16"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 801..850 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 17"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 851..900 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 18"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 901..950 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 19"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 951..1000 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 20"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
+            }
+            if(count > 1000){
+                speed = 110
             }
             binding.tvCount.text = count.toString()
             binding.ivEggRightUp.visibility = View.GONE
@@ -2285,80 +2829,140 @@ class WolfActivity : AppCompatActivity() {
         if (collision) {
             count++
             if(count in 51..100 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 2"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 101..150 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 3"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 151..200 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 4"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 201..250 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 5"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 251..300 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 6"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 301..350 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 7"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 351..400 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 8"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 401..450 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 9"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 451..500 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 10"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 501..550 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 11"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 551..600 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 12"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 601..650 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 13"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 651..700 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 14"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 701..750 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 15"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 751..800 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 16"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 801..850 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 17"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 851..900 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 18"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 901..950 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 19"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 951..1000 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 20"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
+            }
+            if(count > 1000){
+                speed = 110
             }
             binding.tvCount.text = count.toString()
             binding.ivEggLeftDown.visibility = View.GONE
@@ -2377,80 +2981,140 @@ class WolfActivity : AppCompatActivity() {
         if (collision) {
             count++
             if(count in 51..100 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 2"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 101..150 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 3"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 151..200 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 4"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 201..250 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 5"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 251..300 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 6"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 301..350 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 7"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 351..400 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 8"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 401..450 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 9"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 451..500 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 10"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 501..550 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 11"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 551..600 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 12"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 601..650 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 13"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 651..700 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 14"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 701..750 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 15"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 751..800 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 16"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 801..850 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 17"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 851..900 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 18"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 901..950 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 19"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 951..1000 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 20"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
+            }
+            if(count > 1000){
+                speed = 110
             }
             binding.tvCount.text = count.toString()
             binding.ivEggLeftUp.visibility = View.GONE
@@ -2470,80 +3134,140 @@ class WolfActivity : AppCompatActivity() {
         if (collision) {
             count++
             if(count in 51..100 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 2"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 101..150 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 3"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 151..200 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 4"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 201..250 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 5"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 251..300 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 6"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 301..350 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 7"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 351..400 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 8"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 401..450 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 9"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 451..500 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 10"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 501..550 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 11"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 551..600 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 12"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 601..650 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 13"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 651..700 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 14"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 701..750 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 15"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 751..800 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 16"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 801..850 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 17"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 851..900 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 18"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 901..950 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 19"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 951..1000 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 20"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
+            }
+            if(count > 1000){
+                speed = 110
             }
             binding.tvCount.text = count.toString()
             binding.ivEggRightDownTwo.visibility = View.GONE
@@ -2562,80 +3286,140 @@ class WolfActivity : AppCompatActivity() {
         if (collision) {
             count++
             if(count in 51..100 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 2"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 101..150 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 3"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 151..200 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 4"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 201..250 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 5"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 251..300 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 6"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 301..350 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 7"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 351..400 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 8"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 401..450 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 9"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 451..500 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 10"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 501..550 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 11"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 551..600 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 12"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 601..650 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 13"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 651..700 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 14"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 701..750 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 15"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 751..800 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 16"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 801..850 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 17"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 851..900 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 18"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 901..950 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 19"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 951..1000 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 20"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
+            }
+            if(count > 1000){
+                speed = 110
             }
             binding.tvCount.text = count.toString()
             binding.ivEggRightUpTwo.visibility = View.GONE
@@ -2654,80 +3438,140 @@ class WolfActivity : AppCompatActivity() {
         if (collision) {
             count++
             if(count in 51..100 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 2"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 101..150 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 3"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 151..200 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 4"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 201..250 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 5"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 251..300 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 6"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 301..350 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 7"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 351..400 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 8"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 401..450 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 9"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 451..500 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 10"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 501..550 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 11"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 551..600 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 12"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 601..650 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 13"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 651..700 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 14"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 701..750 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 15"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 751..800 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 16"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 801..850 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 17"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 851..900 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 18"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 901..950 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 19"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 951..1000 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 20"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
+            }
+            if(count > 1000){
+                speed = 110
             }
             binding.tvCount.text = count.toString()
             binding.ivEggLeftDownTwo.visibility = View.GONE
@@ -2746,80 +3590,140 @@ class WolfActivity : AppCompatActivity() {
         if (collision) {
             count++
             if(count in 51..100 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 2"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 101..150 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 3"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 151..200 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 4"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 201..250 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 5"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 251..300 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 6"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 301..350 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 7"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 351..400 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 8"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 401..450 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 9"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 451..500 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 10"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 501..550 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 11"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 551..600 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 12"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 601..650 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 13"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 651..700 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 14"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 701..750 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 15"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 751..800 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 16"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 801..850 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 17"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 851..900 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 18"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 901..950 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 19"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
             }
             if(count in 951..1000 && (count-1) % 50 == 0){
-                speed -= 10
-                binding.tvSpeed.text = "Speed : 20"
+                if(binding.seekBar.progress == 20){
+                    speed = 110
+                } else{
+                    speed -= 10
+                }
+            }
+            if(count > 1000){
+                speed = 110
             }
             binding.tvCount.text = count.toString()
             binding.ivEggLeftUpTwo.visibility = View.GONE
