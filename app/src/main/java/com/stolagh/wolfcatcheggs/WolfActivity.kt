@@ -59,6 +59,7 @@ class WolfActivity : AppCompatActivity() {
     private var pressListTracks = false
     private var pressMusic = false
     private var pressSpeed = false
+    private var pressMoreMenu = false
     private var currentRotation = 0f
     private var currentTranslationX = 0f
     private var currentTranslationY = 0f
@@ -108,6 +109,22 @@ class WolfActivity : AppCompatActivity() {
         } else {
             binding.tvBestRecordB.text = "Game B : $bestB"
         }
+        binding.ivMoreMenu.setOnClickListener {
+            if(!pressMoreMenu){
+                binding.cvExit.visibility = View.VISIBLE
+                binding.cvSpeed.visibility = View.VISIBLE
+                binding.cvMusic.visibility = View.VISIBLE
+                binding.cvListMusic.visibility = View.VISIBLE
+                pressMoreMenu = true
+            } else {
+                binding.cvExit.visibility = View.GONE
+                binding.cvSpeed.visibility = View.GONE
+                binding.cvMusic.visibility = View.GONE
+                binding.cvListMusic.visibility = View.GONE
+                pressMoreMenu = false
+            }
+        }
+        binding.cvExit.setOnClickListener { finishAffinity() }
         binding.tvSpeedMinus.setOnClickListener {
             binding.seekBar.progress = binding.seekBar.progress - 1
             binding.tvSpeedSeekLabel.text = "${binding.seekBar.progress}"
